@@ -52,6 +52,8 @@ const RepoNavbar: Component<RepoNavbarProps> = (props) => {
                 <a href={repoHref(props.profile, props.repo)} class={tabClass(props, "code")}>Code</a>
                 <a href={repoHref(props.profile, props.repo, "/issues")} class={tabClass(props, "issues")}>Issues</a>
                 <a href={repoHref(props.profile, props.repo, "/pulls")} class={tabClass(props, "pulls")}>Pull requests</a>
+                <a href={repoHref(props.profile, props.repo, "/discussions")} class={tabClass(props, "discussions")}>Discussions</a>
+                <a href={repoHref(props.profile, props.repo, "/actions")} class={tabClass(props, "actions")}>Actions</a>
             </div>
         </nav>
     );
