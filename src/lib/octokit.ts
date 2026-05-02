@@ -7,5 +7,6 @@ export function getOctokit() {
 }
 
 export function parseRestOctokitResponse(response) {
+    console.log(response);
     return response.data;
 }
