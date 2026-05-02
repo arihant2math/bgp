@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/solid-query";
-import { getOctokit } from "../lib/octokit.ts";
+import {getOctokit, parseRestOctokitResponse} from "../lib/octokit.ts";
 import { Match, Switch } from "solid-js";
 
 function Home() {
@@ -8,7 +8,7 @@ function Home() {
         queryFn: () =>
             getOctokit()
                 .rest.users.getAuthenticated()
-                .then((res) => res.data),
+                .then((res) => parseRestOctokitResponse(res)),
     }));
 
     return (

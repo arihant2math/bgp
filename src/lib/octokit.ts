@@ -5,3 +5,7 @@ export function getOctokit() {
         auth: localStorage.getItem("gh_api_key") ?? undefined,
     });
 }
+
+export function parseRestOctokitResponse(response) {
+    return response.data;
+}
