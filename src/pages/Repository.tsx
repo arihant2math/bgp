@@ -1,6 +1,6 @@
 import RepoNavbar from "../components/RepoNavbar";
 import { useQuery } from "@tanstack/solid-query";
-import {For, Match, Switch} from "solid-js";
+import {For, Match, Show, Switch} from "solid-js";
 import { getOctokit, parseRestOctokitResponse } from "../lib/octokit.ts";
 import { approximateNumber as approx } from 'approximate-number';
 import Octicon from "../components/Octicon.tsx";
@@ -22,13 +22,12 @@ function Repository(props: RepositoryProps) {
     let contentsQuery = useQuery(() => ({
         queryKey: ["contents", props.profile, props.repo],
         queryFn: () =>
-
             getOctokit()
                 .rest.repos.getContent({ owner: props.profile, repo: props.repo, path: "" })
                 .then((res) => {
                     let data = parseRestOctokitResponse(res);
                     data.sort((a, b) => {
-                        a.type.localeCompare(b.type)
+                        b.type.localeCompare(a.type)
                     });
                     return data;
                 }),
@@ -50,9 +49,9 @@ function Repository(props: RepositoryProps) {
                             <h1 class="text-xl">{metadataQuery.data.name}</h1>
                             <div class="badge badge-neutral badge-outline text-xs">{metadataQuery.data.visibility}</div>
                             <div class="ml-auto flex items-center justify-end gap-2">
-                                <button class="btn btn-sm">Watch <div class="badge badge-ghost text-xs">{approx(metadataQuery.data.subscribers_count)}</div></button>
-                                <button class="btn btn-sm">Fork <div class="badge badge-ghost text-xs">{approx(metadataQuery.data.forks_count)}</div></button>
-                                <button class="btn btn-sm">Star <div class="badge badge-ghost text-xs">{approx(metadataQuery.data.stargazers_count)}</div></button>
+                                <button class="btn btn-sm"><Octicon name="eye" size={16} aria-hidden="true" /> Watch <div class="badge badge-ghost text-xs">{approx(metadataQuery.data.subscribers_count)}</div></button>
+                                <button class="btn btn-sm"><Octicon name="repo-forked" size={16} aria-hidden="true" /> Fork <div class="badge badge-ghost text-xs">{approx(metadataQuery.data.forks_count)}</div></button>
+                                <button class="btn btn-sm"><Octicon name="star" size={16} aria-hidden="true" /> Star <div class="badge badge-ghost text-xs">{approx(metadataQuery.data.stargazers_count)}</div></button>
                             </div>
                         </div>
                         <div class="divider my-2"></div>
@@ -85,9 +84,24 @@ function Repository(props: RepositoryProps) {
                                     </Match>
                                 </Switch>
                             </div>
-                            <div class="flex-1">
-                                <b>About</b>
-                                <p>{metadataQuery.data.description}</p>
+                            <div class="flex-1 flex flex-col gap-4">
+                                <div>
+                                    <b>About</b>
+                                    <p>{metadataQuery.data.description}</p>
+                                </div>
+
+                                <Show when={metadataQuery.data.homepage !== null}>
+                                    <div class="flex items-center flex-row gap-2"><Octicon name="link" size={16} aria-hidden="true" /><a href={metadataQuery.data.homepage}>{metadataQuery.data.homepage}</a></div>
+                                </Show>
+                                <Show when={metadataQuery.data.license !== null}>
+                                    <div class="flex items-center flex-row gap-2"><Octicon name="law" size={16} aria-hidden="true" /> <p class="text-sm">{metadataQuery.data.license.name}</p></div>
+                                </Show>
+
+                                <div>
+                                    <div class="flex items-center flex-row gap-2"><Octicon name="star" size={16} aria-hidden="true" /> {approx(metadataQuery.data.stargazers_count)} stars</div>
+                                    <div class="flex items-center flex-row gap-2"><Octicon name="eye" size={16} aria-hidden="true" /> {approx(metadataQuery.data.subscribers_count)} watching</div>
+                                    <div class="flex items-center flex-row gap-2"><Octicon name="repo-forked" size={16} aria-hidden="true" /> {approx(metadataQuery.data.forks_count)} forks</div>
+                                </div>
                             </div>
                         </div>
                     </div>
