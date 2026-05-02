@@ -40,7 +40,15 @@ function Repository(props: RepositoryProps) {
                             </div>
                         </div>
                         <div class="divider my-2"></div>
-                        <p>{metadataQuery.data.description}</p>
+                        <div class="flex flex-row">
+                            <div class="flex-3">
+                                {metadataQuery.data.default_branch}
+                            </div>
+                            <div class="flex-1">
+                                <b>About</b>
+                                <p>{metadataQuery.data.description}</p>
+                            </div>
+                        </div>
                     </div>
                 </Match>
             </Switch>
