@@ -1,13 +1,16 @@
+import RepoNavbar from "../components/RepoNavbar";
+
 export type IssuesProps = {
-  profile: string
-  repo: string
-}
+  profile: string;
+  repo: string;
+};
 
 function Issues(props: IssuesProps) {
-  void props.profile
-  void props.repo
-
-  return <main class="min-h-screen overflow-hidden bg-[#f3efe4] text-[#191510]"></main>
+  return (
+    <main>
+      <RepoNavbar profile={props.profile} repo={props.repo} active="issues" />
+    </main>
+  );
 }
 
-export default Issues
+export default Issues;

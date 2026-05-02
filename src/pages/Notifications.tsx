@@ -1,5 +1,5 @@
 function Notifications() {
-  return <main class="min-h-screen overflow-hidden bg-[#f3efe4] text-[#191510]"></main>
+  return <main></main>;
 }
 
-export default Notifications
+export default Notifications;

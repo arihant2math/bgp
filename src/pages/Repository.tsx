@@ -1,13 +1,16 @@
+import RepoNavbar from "../components/RepoNavbar";
+
 export type RepositoryProps = {
-  profile: string
-  repo: string
-}
+  profile: string;
+  repo: string;
+};
 
 function Repository(props: RepositoryProps) {
-  void props.profile
-  void props.repo
-
-  return <main class="min-h-screen overflow-hidden bg-[#f3efe4] text-[#191510]"></main>
+  return (
+    <main>
+      <RepoNavbar profile={props.profile} repo={props.repo} active="code" />
+    </main>
+  );
 }
 
-export default Repository
+export default Repository;

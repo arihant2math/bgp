@@ -1,11 +1,11 @@
 export type ProfileProps = {
-  profile: string
-}
+  profile: string;
+};
 
 function Profile(props: ProfileProps) {
-  void props.profile
+  void props.profile;
 
-  return <main class="min-h-screen overflow-hidden bg-[#f3efe4] text-[#191510]"></main>
+  return <main></main>;
 }
 
-export default Profile
+export default Profile;

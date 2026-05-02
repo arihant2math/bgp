@@ -1,13 +1,16 @@
+import RepoNavbar from "../components/RepoNavbar";
+
 export type PullsProps = {
-  profile: string
-  repo: string
-}
+  profile: string;
+  repo: string;
+};
 
 function Pulls(props: PullsProps) {
-  void props.profile
-  void props.repo
-
-  return <main class="min-h-screen overflow-hidden bg-[#f3efe4] text-[#191510]"></main>
+  return (
+    <main>
+      <RepoNavbar profile={props.profile} repo={props.repo} active="pulls" />
+    </main>
+  );
 }
 
-export default Pulls
+export default Pulls;

@@ -1,13 +1,13 @@
-import { render } from 'solid-js/web'
-import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
-import './styles.css'
-import App from './App'
+import { render } from "solid-js/web";
+import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import "./styles.css";
+import App from "./App";
 
-const root = document.getElementById('root')
-const queryClient = new QueryClient()
+const root = document.getElementById("root");
+const queryClient = new QueryClient();
 
 if (!root) {
-  throw new Error('Root element not found')
+  throw new Error("Root element not found");
 }
 
 render(
@@ -17,4 +17,4 @@ render(
     </QueryClientProvider>
   ),
   root,
-)
+);
