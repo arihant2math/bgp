@@ -3,19 +3,3 @@
 @theme {
   --font-sans: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
-
-html {
-  background: #f3efe4;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
