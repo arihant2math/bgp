@@ -1,11 +1,11 @@
 export type ProfileProps = {
-  profile: string;
+    profile: string;
 };
 
 function Profile(props: ProfileProps) {
-  void props.profile;
+    void props.profile;
 
-  return <main></main>;
+    return <main></main>;
 }
 
 export default Profile;

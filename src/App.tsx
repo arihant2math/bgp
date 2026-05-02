@@ -9,79 +9,77 @@ import Profile from "./pages/Profile";
 import Pulls from "./pages/Pulls";
 import Repository from "./pages/Repository";
 
-const EmptyPage = () => (
-  <main class="min-h-screen overflow-hidden bg-[#f3efe4] text-[#191510]"></main>
-);
+const EmptyPage = () => <main></main>;
 
 const requireAuth = (
-  renderPage: (props: RouteSectionProps) => JSX.Element,
+    renderPage: (props: RouteSectionProps) => JSX.Element,
 ): Component<RouteSectionProps> => {
-  return function ProtectedRoute(props) {
-    if (!localStorage.getItem("gh_api_key")) {
-      return <Navigate href="/login" />;
-    }
+    return function ProtectedRoute(props) {
+        if (!localStorage.getItem("gh_api_key")) {
+            return <Navigate href="/login" />;
+        }
 
-    return renderPage(props);
-  };
+        return renderPage(props);
+    };
 };
 
 function App() {
-  return (
-    <Router>
-      <Route
-        path="/"
-        component={requireAuth(() => (
-          <Home />
-        ))}
-      />
-      <Route path="/login" component={Login} />
-      <Route
-        path="/notifications"
-        component={requireAuth(() => (
-          <Notifications />
-        ))}
-      />
-      <Route
-        path="/:profile"
-        component={requireAuth((props) => (
-          <Profile profile={props.params.profile ?? ""} />
-        ))}
-      />
-      <Route
-        path="/:profile/:repo"
-        component={requireAuth((props) => (
-          <Repository
-            profile={props.params.profile ?? ""}
-            repo={props.params.repo ?? ""}
-          />
-        ))}
-      />
-      <Route
-        path="/:profile/:repo/issues"
-        component={requireAuth((props) => (
-          <Issues
-            profile={props.params.profile ?? ""}
-            repo={props.params.repo ?? ""}
-          />
-        ))}
-      />
-      <Route
-        path="/:profile/:repo/pulls"
-        component={requireAuth((props) => (
-          <Pulls
-            profile={props.params.profile ?? ""}
-            repo={props.params.repo ?? ""}
-          />
-        ))}
-      />
-      <Route
-        path="*"
-        component={requireAuth(() => (
-          <EmptyPage />
-        ))}
-      />
-    </Router>
-  );
+    return (
+        <Router>
+            <Route
+                path="/"
+                component={requireAuth(() => (
+                    <Home />
+                ))}
+            />
+            <Route path="/login" component={Login} />
+            <Route
+                path="/notifications"
+                component={requireAuth(() => (
+                    <Notifications />
+                ))}
+            />
+            <Route
+                path="/:profile"
+                component={requireAuth((props) => (
+                    <Profile profile={props.params.profile ?? ""} />
+                ))}
+            />
+            <Route
+                path="/:profile/:repo"
+                component={requireAuth((props) => (
+                    <Repository
+                        profile={props.params.profile ?? ""}
+                        repo={props.params.repo ?? ""}
+                    />
+                ))}
+            />
+            <Route
+                path="/:profile/:repo/issues"
+                component={requireAuth((props) => (
+                    <Issues
+                        profile={props.params.profile ?? ""}
+                        repo={props.params.repo ?? ""}
+                    />
+                ))}
+            />
+            <Route
+                path="/:profile/:repo/pulls"
+                component={requireAuth((props) => (
+                    <Pulls
+                        profile={props.params.profile ?? ""}
+                        repo={props.params.repo ?? ""}
+                    />
+                ))}
+            />
+            <Route
+                path="*"
+                component={requireAuth(() => (
+                    <EmptyPage />
+                ))}
+            />
+        </Router>
+    );
 }
 
 export default App;

@@ -1,5 +1,5 @@
 function Notifications() {
-  return <main></main>;
+    return <main></main>;
 }
 
 export default Notifications;
