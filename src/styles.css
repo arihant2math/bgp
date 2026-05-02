@@ -1,5 +1,4 @@
 @import "tailwindcss";
+@plugin "daisyui";
 
-@theme {
-    --font-sans: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-}
+@theme {}

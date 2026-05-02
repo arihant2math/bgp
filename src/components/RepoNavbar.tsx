@@ -41,25 +41,17 @@ function repoHref(profile: string, repo: string, suffix = "") {
     return `${base}${suffix}`;
 }
 
+function tabClass(props: RepoNavbarProps, tab: string) {
+    return `tab ${props.active === tab ? "tab-active" : ""}`;
+}
+
 const RepoNavbar: Component<RepoNavbarProps> = (props) => {
     return (
         <nav>
-            <div class="mx-auto flex max-w-6xl items-end px-4 sm:px-6 lg:px-8">
-                <RepoNavbarItem
-                    href={repoHref(props.profile, props.repo)}
-                    label="Code"
-                    active={props.active === "code"}
-                ></RepoNavbarItem>
-                <RepoNavbarItem
-                    href={repoHref(props.profile, props.repo, "/issues")}
-                    label="Issues"
-                    active={props.active === "issues"}
-                ></RepoNavbarItem>
-                <RepoNavbarItem
-                    href={repoHref(props.profile, props.repo, "/pulls")}
-                    label="Pull requests"
-                    active={props.active === "pulls"}
-                ></RepoNavbarItem>
+            <div role="tablist" class="tabs tabs-border">
+                <a href={repoHref(props.profile, props.repo)} class={tabClass(props, "code")}>Code</a>
+                <a href={repoHref(props.profile, props.repo, "/issues")} class={tabClass(props, "issues")}>Issues</a>
+                <a href={repoHref(props.profile, props.repo, "/pulls")} class={tabClass(props, "pulls")}>Pull requests</a>
             </div>
         </nav>
     );
