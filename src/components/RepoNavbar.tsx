@@ -43,7 +43,7 @@ function repoHref(profile: string, repo: string, suffix = "") {
 }
 
 function tabClass(props: RepoNavbarProps, tab: string) {
-    return `tab ${props.active === tab ? "tab-active" : ""}`;
+    return `tab ${props.active === tab ? "tab-active" : ""} gap-2`;
 }
 
 const RepoNavbar: Component<RepoNavbarProps> = (props) => {
