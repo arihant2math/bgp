@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
+import { Button } from "@primer/solid";
 
 function Login() {
     const navigate = useNavigate();
@@ -31,12 +32,9 @@ function Login() {
                     onInput={(event) => setToken(event.currentTarget.value)}
                     autocomplete="off"
                 />
-                <button
-                    class="bg-blue-500 text-white rounded-md w-fit p-1"
-                    type="submit"
-                >
+                <Button variant="primary" type="submit">
                     Login
-                </button>
+                </Button>
                 <p>
                     Create a personal auth token (
                     <a

@@ -1,6 +1,7 @@
 import FileList from "../../components/FileList.tsx";
 import FileRenderer from "../../components/FileRenderer.tsx";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";
+import { Button } from "@primer/solid";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch } from "solid-js";
 import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
@@ -105,44 +106,51 @@ function Repository(props: RepositoryProps) {
                                 {metadataQuery.data.visibility}
                             </div>
                             <div class="ml-auto flex items-center justify-end gap-2">
-                                <button class="btn btn-sm">
-                                    <Octicon
-                                        name="eye"
-                                        size={16}
-                                        aria-hidden="true"
-                                    />{" "}
-                                    Watch{" "}
-                                    <div class="badge badge-ghost text-xs">
-                                        {approx(
-                                            metadataQuery.data
-                                                .subscribers_count,
-                                        )}
-                                    </div>
-                                </button>
-                                <button class="btn btn-sm">
-                                    <Octicon
-                                        name="repo-forked"
-                                        size={16}
-                                        aria-hidden="true"
-                                    />{" "}
-                                    Fork{" "}
-                                    <div class="badge badge-ghost text-xs">
-                                        {approx(metadataQuery.data.forks_count)}
-                                    </div>
-                                </button>
-                                <button class="btn btn-sm">
-                                    <Octicon
-                                        name="star"
-                                        size={16}
-                                        aria-hidden="true"
-                                    />{" "}
-                                    Star{" "}
-                                    <div class="badge badge-ghost text-xs">
-                                        {approx(
-                                            metadataQuery.data.stargazers_count,
-                                        )}
-                                    </div>
-                                </button>
+                                <Button
+                                    size="small"
+                                    leadingVisual={
+                                        <Octicon
+                                            name="eye"
+                                            size={16}
+                                            aria-hidden="true"
+                                        />
+                                    }
+                                    count={approx(
+                                        metadataQuery.data.subscribers_count,
+                                    )}
+                                >
+                                    Watch
+                                </Button>
+                                <Button
+                                    size="small"
+                                    leadingVisual={
+                                        <Octicon
+                                            name="repo-forked"
+                                            size={16}
+                                            aria-hidden="true"
+                                        />
+                                    }
+                                    count={approx(
+                                        metadataQuery.data.forks_count,
+                                    )}
+                                >
+                                    Fork
+                                </Button>
+                                <Button
+                                    size="small"
+                                    leadingVisual={
+                                        <Octicon
+                                            name="star"
+                                            size={16}
+                                            aria-hidden="true"
+                                        />
+                                    }
+                                    count={approx(
+                                        metadataQuery.data.stargazers_count,
+                                    )}
+                                >
+                                    Star
+                                </Button>
                             </div>
                         </div>
                         <div class="divider my-2"></div>

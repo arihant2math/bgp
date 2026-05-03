@@ -1,5 +1,6 @@
 import { render } from "solid-js/web";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import "@primer/solid/styles.css";
 import "./styles.css";
 import App from "./App";
 

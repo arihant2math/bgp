@@ -1,4 +1,5 @@
 import { useSearchParams } from "@solidjs/router";
+import { Button, ButtonBase } from "@primer/solid";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo, type JSX } from "solid-js";
 import { format } from "timeago.js";
@@ -397,9 +398,14 @@ function ActiveFilters(props: { chips: FilterChip[]; clearHref: string }) {
                         </a>
                     )}
                 </For>
-                <a href={props.clearHref} class="btn btn-ghost btn-xs">
+                <Button
+                    as="a"
+                    href={props.clearHref}
+                    size="small"
+                    variant="invisible"
+                >
                     Clear all
-                </a>
+                </Button>
             </div>
         </Show>
     );
@@ -441,44 +447,54 @@ function WorkItemsSearchControls(props: {
                         autocomplete="off"
                     />
                 </label>
-                <button
+                <Button
+                    icon={
+                        <Octicon name="search" size={18} aria-hidden="true" />
+                    }
                     type="submit"
-                    class="btn btn-outline join-item h-9 min-h-9 border-base-300 px-4"
+                    class="join-item"
                     aria-label={`Search ${itemNoun(props.pageProps.kind)}`}
-                >
-                    <Octicon name="search" size={18} aria-hidden="true" />
-                </button>
+                />
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <a
+                <Button
+                    as="a"
                     href={`${githubBase()}/labels`}
                     target="_blank"
                     rel="noreferrer"
-                    class="btn btn-outline h-9 min-h-9 border-base-300"
+                    leadingVisual={
+                        <Octicon name="tag" size={16} aria-hidden="true" />
+                    }
                 >
-                    <Octicon name="tag" size={16} aria-hidden="true" />
                     Labels
-                </a>
-                <a
+                </Button>
+                <Button
+                    as="a"
                     href={`${githubBase()}/milestones`}
                     target="_blank"
                     rel="noreferrer"
-                    class="btn btn-outline h-9 min-h-9 border-base-300"
+                    leadingVisual={
+                        <Octicon
+                            name="milestone"
+                            size={16}
+                            aria-hidden="true"
+                        />
+                    }
                 >
-                    <Octicon name="milestone" size={16} aria-hidden="true" />
                     Milestones
-                </a>
-                <a
+                </Button>
+                <Button
+                    as="a"
                     href={newHref()}
                     target="_blank"
                     rel="noreferrer"
-                    class="btn btn-success h-9 min-h-9"
+                    variant="primary"
                 >
                     {props.pageProps.kind === "issues"
                         ? "New issue"
                         : "New pull request"}
-                </a>
+                </Button>
             </div>
         </div>
     );
@@ -487,16 +503,27 @@ function WorkItemsSearchControls(props: {
 function FilterDropdown(props: { label: string; children: JSX.Element }) {
     return (
         <details class="dropdown dropdown-end">
-            <summary class="btn btn-ghost btn-sm h-8 min-h-8 gap-1 px-2 text-sm font-medium text-base-content/75 hover:text-base-content">
+            <ButtonBase
+                as="summary"
+                variant="invisible"
+                size="small"
+                class="list-none [&::-webkit-details-marker]:hidden"
+                trailingVisual={
+                    <Octicon
+                        name="triangle-down"
+                        size={12}
+                        aria-hidden="true"
+                    />
+                }
+            >
                 {props.label}
-                <Octicon name="triangle-down" size={12} aria-hidden="true" />
-            </summary>
+            </ButtonBase>
             <div class="menu dropdown-content z-20 mt-2 w-72 rounded-box border border-base-300 bg-base-100 p-4 shadow-xl">
                 {props.children}
                 <div class="mt-4 flex justify-end gap-2">
-                    <button type="submit" class="btn btn-primary btn-sm">
+                    <Button type="submit" variant="primary" size="small">
                         Apply
-                    </button>
+                    </Button>
                 </div>
             </div>
         </details>
@@ -760,9 +787,14 @@ function WorkItemsToolbar(props: {
                     </fieldset>
                 </FilterDropdown>
 
-                <a href={props.clearHref} class="btn btn-ghost btn-sm">
+                <Button
+                    as="a"
+                    href={props.clearHref}
+                    size="small"
+                    variant="invisible"
+                >
                     Reset
-                </a>
+                </Button>
             </div>
         </div>
     );
@@ -895,16 +927,23 @@ function EmptyWorkItems(props: {
                 </p>
                 <div class="mt-4 flex flex-wrap justify-center gap-2">
                     <Show when={isEmptyPage()}>
-                        <a
+                        <Button
+                            as="a"
                             href={pageHref(props.pageProps, props.filters, 1)}
-                            class="btn btn-primary btn-sm"
+                            variant="primary"
+                            size="small"
                         >
                             Go to first page
-                        </a>
+                        </Button>
                     </Show>
-                    <a href={props.clearHref} class="btn btn-ghost btn-sm">
+                    <Button
+                        as="a"
+                        href={props.clearHref}
+                        size="small"
+                        variant="invisible"
+                    >
                         Clear filters
-                    </a>
+                    </Button>
                 </div>
             </div>
         </div>
@@ -1184,55 +1223,45 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                         <Show
                             when={hasPrevious()}
                             fallback={
-                                <button
-                                    type="button"
-                                    class="btn join-item"
-                                    disabled
-                                >
+                                <Button class="join-item" disabled>
                                     Previous
-                                </button>
+                                </Button>
                             }
                         >
-                            <a
+                            <Button
+                                as="a"
                                 href={pageHref(
                                     props,
                                     filters(),
                                     filters().page - 1,
                                 )}
-                                class="btn join-item"
+                                class="join-item"
                             >
                                 Previous
-                            </a>
+                            </Button>
                         </Show>
-                        <button
-                            type="button"
-                            class="btn join-item btn-ghost"
-                            disabled
-                        >
+                        <Button class="join-item" variant="invisible" disabled>
                             Page {filters().page}
-                        </button>
+                        </Button>
                         <Show
                             when={hasNext()}
                             fallback={
-                                <button
-                                    type="button"
-                                    class="btn join-item"
-                                    disabled
-                                >
+                                <Button class="join-item" disabled>
                                     Next
-                                </button>
+                                </Button>
                             }
                         >
-                            <a
+                            <Button
+                                as="a"
                                 href={pageHref(
                                     props,
                                     filters(),
                                     filters().page + 1,
                                 )}
-                                class="btn join-item"
+                                class="join-item"
                             >
                                 Next
-                            </a>
+                            </Button>
                         </Show>
                     </div>
                 </div>

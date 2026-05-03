@@ -21,6 +21,9 @@ const primerSolidStyles = fileURLToPath(
 export default defineConfig({
     base,
     plugins: [solid(), tailwindcss()],
+    optimizeDeps: {
+        exclude: ["@primer/solid"],
+    },
     resolve: {
         alias: [
             {

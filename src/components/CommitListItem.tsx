@@ -1,3 +1,4 @@
+import { Button } from "@primer/solid";
 import { createMemo, createSignal, For, Show } from "solid-js";
 import { format } from "timeago.js";
 import type { CommitAuthor, CommitSummary } from "../lib/githubCommits.ts";
@@ -35,21 +36,20 @@ function authorsLabel(authors: CommitAuthor[], totalCount: number) {
 
 function HistoryButton(props: { label?: string; href?: string }) {
     const label = () => props.label ?? "History";
-    const className = "btn btn-sm btn-ghost shrink-0";
 
     return (
         <Show
             when={props.href}
             fallback={
-                <button type="button" class={className}>
+                <Button type="button" size="small" variant="invisible">
                     {label()}
-                </button>
+                </Button>
             }
         >
             {(href) => (
-                <a href={href()} class={className}>
+                <Button as="a" href={href()} size="small" variant="invisible">
                     {label()}
-                </a>
+                </Button>
             )}
         </Show>
     );
@@ -137,22 +137,25 @@ function CommitBody(props: CommitListItemProps & { commit: CommitSummary }) {
                 {shownMessage()}
             </span>
             <Show when={needsExpansion()}>
-                <button
+                <Button
+                    icon={
+                        <Octicon
+                            name={expanded() ? "chevron-up" : "chevron-down"}
+                            size={14}
+                            aria-hidden="true"
+                        />
+                    }
                     type="button"
-                    class="btn btn-ghost btn-xs shrink-0"
+                    size="small"
+                    variant="invisible"
+                    class="shrink-0"
                     aria-label={
                         expanded()
                             ? "Collapse commit message"
                             : "Expand commit message"
                     }
                     onClick={() => setExpanded((value) => !value)}
-                >
-                    <Octicon
-                        name={expanded() ? "chevron-up" : "chevron-down"}
-                        size={14}
-                        aria-hidden="true"
-                    />
-                </button>
+                />
             </Show>
             <div class="ml-auto flex shrink-0 items-center gap-2">
                 <div class="flex items-center gap-2 text-xs opacity-70">

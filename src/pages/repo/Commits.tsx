@@ -1,4 +1,5 @@
 import { useSearchParams } from "@solidjs/router";
+import { Button } from "@primer/solid";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo } from "solid-js";
 import Avatar from "../../components/Avatar.tsx";
@@ -80,7 +81,7 @@ function CommitRow(props: { commit: CommitSummary }) {
                     </Show>
                 </div>
                 <div class="mt-1 text-sm opacity-70">
-                    {authorsText(props.commit)} committed {" "}
+                    {authorsText(props.commit)} committed{" "}
                     <time
                         dateTime={props.commit.committedDate}
                         title={new Date(
@@ -96,20 +97,28 @@ function CommitRow(props: { commit: CommitSummary }) {
             <Show
                 when={props.commit.commitUrl}
                 fallback={
-                    <span class="btn btn-sm btn-ghost font-mono">
+                    <Button
+                        size="small"
+                        variant="invisible"
+                        class="font-mono"
+                        disabled
+                    >
                         {props.commit.abbreviatedOid}
-                    </span>
+                    </Button>
                 }
             >
                 {(commitUrl) => (
-                    <a
+                    <Button
+                        as="a"
                         href={commitUrl()}
                         target="_blank"
                         rel="noreferrer"
-                        class="btn btn-sm btn-ghost font-mono"
+                        size="small"
+                        variant="invisible"
+                        class="font-mono"
                     >
                         {props.commit.abbreviatedOid}
-                    </a>
+                    </Button>
                 )}
             </Show>
         </li>
@@ -144,7 +153,9 @@ function Commits(props: CommitsProps) {
         <RepoPageLayout profile={props.profile} repo={props.repo} active="code">
             <div class="mb-4 flex flex-wrap items-center gap-3">
                 <h1 class="text-xl font-semibold">Commit history</h1>
-                <div class="badge badge-neutral badge-outline">{props.tree}</div>
+                <div class="badge badge-neutral badge-outline">
+                    {props.tree}
+                </div>
                 <Show when={path()}>
                     {(currentPath) => (
                         <div class="badge badge-ghost">/{currentPath()}</div>
@@ -179,40 +190,26 @@ function Commits(props: CommitsProps) {
                                 <Show
                                     when={history().hasPrevious}
                                     fallback={
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            disabled
-                                        >
-                                            Previous
-                                        </button>
+                                        <Button disabled>Previous</Button>
                                     }
                                 >
-                                    <a
+                                    <Button
+                                        as="a"
                                         href={commitPageHref(props, page() - 1)}
-                                        class="btn"
                                     >
                                         Previous
-                                    </a>
+                                    </Button>
                                 </Show>
                                 <Show
                                     when={history().hasNext}
-                                    fallback={
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            disabled
-                                        >
-                                            Next
-                                        </button>
-                                    }
+                                    fallback={<Button disabled>Next</Button>}
                                 >
-                                    <a
+                                    <Button
+                                        as="a"
                                         href={commitPageHref(props, page() + 1)}
-                                        class="btn"
                                     >
                                         Next
-                                    </a>
+                                    </Button>
                                 </Show>
                             </div>
                         </>
