@@ -21,8 +21,8 @@ const UserNavbar: Component<UserNavbarProps> = (props) => {
                     <Octicon name="book" size={16} aria-hidden="true" />
                     Overview
                 </a>
-                <a href={props.profile} class={tabClass(props, "repositories")}>
-                    <Octicon name="repository" size={16} aria-hidden="true" />
+                <a href={profileHref(props.profile, "?tab=repositories")} class={tabClass(props, "repositories")}>
+                    <Octicon name="repo" size={16} aria-hidden="true" />
                     Repositories
                 </a>
             </div>
