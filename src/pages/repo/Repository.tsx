@@ -39,7 +39,14 @@ function Repository(props: RepositoryProps) {
                 <Match when={metadataQuery.isSuccess}>
                     <>
                         <div class="flex min-h-12 flex-row items-center gap-2">
-                            <h1 class="text-xl">{metadataQuery.data.name}</h1>
+                            <h1 class="text-xl flex flex-row items-center gap-2">
+                                <Octicon
+                                    name={metadataQuery.data.fork ? "repo-forked" : "repo"}
+                                    size={24}
+                                    class="shrink-0 opacity-80"
+                                    aria-hidden="true"
+                                />
+                                {metadataQuery.data.name}</h1>
                             <div class="badge badge-neutral badge-outline text-xs">{metadataQuery.data.visibility}</div>
                             <div class="ml-auto flex items-center justify-end gap-2">
                                 <button class="btn btn-sm"><Octicon name="eye" size={16} aria-hidden="true" /> Watch <div class="badge badge-ghost text-xs">{approx(metadataQuery.data.subscribers_count)}</div></button>
