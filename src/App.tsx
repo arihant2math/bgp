@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import Pulls from "./pages/repo/Pulls.tsx";
 import Repository from "./pages/repo/Repository.tsx";
 import RepositoryItem from "./pages/repo/RepositoryItem.tsx";
+import MainNavbar from "./components/MainNavbar.tsx";
 
 const EmptyPage = () => <main></main>;
 
@@ -26,7 +27,9 @@ const requireAuth = (
 
 function App() {
     return (
-        <Router>
+        <div>
+            <MainNavbar link="Better Github Project" href="/" />
+            <Router>
             <Route
                 path="/"
                 component={requireAuth(() => (
@@ -102,6 +105,7 @@ function App() {
                 ))}
             />
         </Router>
+    </div>
     );
 }
 
