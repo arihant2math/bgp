@@ -8,10 +8,6 @@ export function repoHref(profile: string, repo: string, suffix = "") {
     return `${base}${suffix}`;
 }
 
-function encodedPath(path: string[] = []) {
-    return path.length > 0 ? `/${path.map(encodeURIComponent).join("/")}` : "";
-}
-
 export function repoTreeHref(
     profile: string,
     repo: string,

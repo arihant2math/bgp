@@ -6,7 +6,7 @@ import Octicon from "../../components/Octicon.tsx";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 import { fetchCommitHistory } from "../../lib/githubCommits.ts";
 import type { CommitSummary } from "../../lib/githubCommits.ts";
-import { repoCommitsHref, repoTreeHref } from "../../lib/hrefGen.ts";
+import { repoCommitsHref } from "../../lib/hrefGen.ts";
 
 const COMMITS_PER_PAGE = 30;
 
