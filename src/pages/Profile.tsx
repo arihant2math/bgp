@@ -48,6 +48,7 @@ function Profile(props: ProfileProps) {
                                     language={repo.language}
                                     stars={repo.stargazers_count}
                                     forks={repo.forks_count}
+                                    isFork={repo.fork}
                                 />
                             )}
                         </For>

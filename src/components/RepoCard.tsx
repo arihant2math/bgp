@@ -12,6 +12,7 @@ export type RepoCardProps = {
     language?: string | null;
     stars?: number;
     forks?: number;
+    isFork?: boolean;
     href?: string;
 };
 
@@ -23,7 +24,12 @@ const RepoCard: Component<RepoCardProps> = (props) => {
         <article class="rounded-md border border-base-content/50 bg-base-100 p-4 min-h-35 flex flex-col justify-between">
             <div>
                 <div class="flex items-center gap-3">
-                    <Octicon name="repo" size={24} class="shrink-0 opacity-80" aria-hidden="true" />
+                    <Octicon
+                        name={props.isFork ? "repo-forked" : "repo"}
+                        size={24}
+                        class="shrink-0 opacity-80"
+                        aria-hidden="true"
+                    />
                     <a href={href()} class="font-semibold text-xl link link-hover leading-tight">
                         {props.owner}/{props.name}
                     </a>
