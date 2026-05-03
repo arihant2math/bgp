@@ -8,6 +8,7 @@ import Notifications from "./pages/Notifications";
 import Profile from "./pages/Profile";
 import Pulls from "./pages/Pulls";
 import Repository from "./pages/Repository";
+import RepositoryItem from "./pages/RepositoryItem";
 
 const EmptyPage = () => <main></main>;
 
@@ -51,6 +52,17 @@ function App() {
                     <Repository
                         profile={props.params.profile ?? ""}
                         repo={props.params.repo ?? ""}
+                    />
+                ))}
+            />
+            <Route
+                path="/:profile/:repo/tree/:tree/*path"
+                component={requireAuth((props) => (
+                    <RepositoryItem
+                        profile={props.params.profile ?? ""}
+                        repo={props.params.repo ?? ""}
+                        tree={props.params.tree ?? ""}
+                        path={"/" + (Array.isArray(props.params.path) ? props.params.path.join("/") : props.params.path ?? "")}
                     />
                 ))}
             />

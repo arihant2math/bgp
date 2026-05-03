@@ -37,7 +37,7 @@ type RepoNavbarProps = {
 
 const iconClass = "h-4 w-4 stroke-current";
 
-function repoHref(profile: string, repo: string, suffix = "") {
+export function repoHref(profile: string, repo: string, suffix = "") {
     const base = `/${encodeURIComponent(profile)}/${encodeURIComponent(repo)}`;
     return `${base}${suffix}`;
 }

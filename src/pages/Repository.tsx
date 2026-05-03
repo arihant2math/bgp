@@ -1,4 +1,4 @@
-import RepoNavbar from "../components/RepoNavbar";
+import RepoNavbar, {repoHref} from "../components/RepoNavbar";
 import FileList from "../components/FileList.tsx";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch } from "solid-js";
@@ -17,6 +17,15 @@ function Repository(props: RepositoryProps) {
         queryFn: () =>
             getOctokit()
                 .rest.repos.get({ owner: props.profile, repo: props.repo })
+                .then((res) => parseRestOctokitResponse(res)),
+    }));
+
+    // TODO: Standardize contents queries
+    const contentsQuery = useQuery(() => ({
+        queryKey: ["contents", props.profile, props.repo],
+        queryFn: () =>
+            getOctokit()
+                .rest.repos.getContent({ owner: props.profile, repo: props.repo, path: "" })
                 .then((res) => parseRestOctokitResponse(res)),
     }));
 
@@ -44,8 +53,14 @@ function Repository(props: RepositoryProps) {
                         <div class="divider my-2"></div>
                         <div class="flex flex-row">
                             <div class="flex-3">
-                                <div>{metadataQuery.data.default_branch} {metadataQuery.data.default_branch}</div>
-                                <FileList profile={props.profile} repo={props.repo} />
+                                <div>{metadataQuery.data.default_branch}</div>
+                                <Switch>
+                                    <Match when={contentsQuery.isPending}>Loading ...</Match>
+                                    <Match when={contentsQuery.isError}>Error</Match>
+                                    <Match when={contentsQuery.isSuccess}>
+                                        <FileList contents={contentsQuery.data} tree={metadataQuery.data.default_branch} repoUrl={repoHref(props.profile, props.repo)}/>
+                                    </Match>
+                                </Switch>
                             </div>
                             <div class="flex-1 flex flex-col gap-4">
                                 <div>
