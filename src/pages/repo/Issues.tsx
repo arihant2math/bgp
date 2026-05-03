@@ -1,4 +1,4 @@
-import RepoPageLayout from "../../components/RepoPageLayout.tsx";
+import RepoWorkItemsPage from "../../components/RepoWorkItemsPage.tsx";
 
 export type IssuesProps = {
     profile: string;
@@ -7,10 +7,10 @@ export type IssuesProps = {
 
 function Issues(props: IssuesProps) {
     return (
-        <RepoPageLayout
+        <RepoWorkItemsPage
             profile={props.profile}
             repo={props.repo}
-            active="issues"
+            kind="issues"
         />
     );
 }

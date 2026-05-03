@@ -1,4 +1,4 @@
-import RepoPageLayout from "../../components/RepoPageLayout.tsx";
+import RepoWorkItemsPage from "../../components/RepoWorkItemsPage.tsx";
 
 export type PullsProps = {
     profile: string;
@@ -7,10 +7,10 @@ export type PullsProps = {
 
 function Pulls(props: PullsProps) {
     return (
-        <RepoPageLayout
+        <RepoWorkItemsPage
             profile={props.profile}
             repo={props.repo}
-            active="pulls"
+            kind="pulls"
         />
     );
 }
