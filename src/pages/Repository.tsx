@@ -57,7 +57,7 @@ function Repository(props: RepositoryProps) {
                         <div class="divider my-2"></div>
                         <div class="flex flex-row">
                             <div class="flex-3">
-                                {metadataQuery.data.default_branch}
+                                <div>{metadataQuery.data.default_branch} {metadataQuery.data.default_branch}</div>
                                 <Switch>
                                     <Match when={contentsQuery.isPending}>Loading ...</Match>
                                     <Match when={contentsQuery.isError}>Error</Match>
@@ -88,6 +88,13 @@ function Repository(props: RepositoryProps) {
                                 <div>
                                     <b>About</b>
                                     <p>{metadataQuery.data.description}</p>
+                                    <div class="flex flex-wrap items-start gap-2">
+                                        <For each={metadataQuery.data.topics}>
+                                            {(item, index) =>
+                                                <div class="badge badge-info badge-outline w-fit text-xs">{item}</div>
+                                            }
+                                        </For>
+                                    </div>
                                 </div>
 
                                 <Show when={metadataQuery.data.homepage !== null}>
