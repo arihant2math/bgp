@@ -1,10 +1,11 @@
-import RepoNavbar, {repoHref} from "../components/RepoNavbar";
+import RepoNavbar from "../components/RepoNavbar";
 import FileList from "../components/FileList.tsx";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch } from "solid-js";
 import { getOctokit, parseRestOctokitResponse } from "../lib/octokit.ts";
 import { approximateNumber as approx } from "approximate-number";
 import Octicon from "../components/Octicon.tsx";
+import {repoHref} from "../lib/hrefGen.ts";
 
 export type RepositoryProps = {
     profile: string;
@@ -30,6 +31,7 @@ function Repository(props: RepositoryProps) {
                 .then((res) => parseRestOctokitResponse(res)),
     }));
 
+    // TODO: abstract out RepoNavbar and <div class="flex flex-col mx-8"> for all /profile/repo routes
     return (
         <main>
             <RepoNavbar

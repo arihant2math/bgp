@@ -1,8 +1,5 @@
-import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Switch } from "solid-js";
-import { getOctokit, parseRestOctokitResponse } from "../lib/octokit.ts";
 import Octicon from "./Octicon.tsx";
-import {repoHref} from "./RepoNavbar.tsx";
 
 export type FileListProps = {
     contents: any[],

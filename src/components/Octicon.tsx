@@ -60,7 +60,7 @@ const Octicon: Component<OcticonProps> = (props) => {
             width={width()}
             height={requestedHeight()}
             viewBox={`0 0 ${naturalIcon().width} ${naturalHeight()}`}
-            class={`octicon octicon-${local.name}${local.class ? ` ${local.class}` : ""}`}
+            class={`octicon octicon-${String(local.name)}${local.class ? ` ${local.class}` : ""}`}
             aria-label={label()}
             aria-hidden={label() ? undefined : (local["aria-hidden"] ?? "true")}
             role={label() ? (local.role ?? "img") : local.role}
