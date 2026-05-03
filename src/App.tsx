@@ -76,7 +76,7 @@ function App() {
                         profile={props.params.profile ?? ""}
                         repo={props.params.repo ?? ""}
                         tree={props.params.tree ?? ""}
-                        path={Array.isArray(props.params.path) ? props.params.path : [props.params.path]}
+                        path={Array.isArray(props.params.path) ? props.params.path : props.params.path ? [props.params.path] : []}
                     />
                 ))}
             />
