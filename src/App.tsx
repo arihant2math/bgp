@@ -2,13 +2,13 @@ import { Navigate, Route, Router } from "@solidjs/router";
 import type { RouteSectionProps } from "@solidjs/router";
 import type { Component, JSX } from "solid-js";
 import Home from "./pages/Home";
-import Issues from "./pages/Issues";
+import Issues from "./pages/repo/Issues.tsx";
 import Login from "./pages/Login";
 import Notifications from "./pages/Notifications";
 import Profile from "./pages/Profile";
-import Pulls from "./pages/Pulls";
-import Repository from "./pages/Repository";
-import RepositoryItem from "./pages/RepositoryItem";
+import Pulls from "./pages/repo/Pulls.tsx";
+import Repository from "./pages/repo/Repository.tsx";
+import RepositoryItem from "./pages/repo/RepositoryItem.tsx";
 
 const EmptyPage = () => <main></main>;
 

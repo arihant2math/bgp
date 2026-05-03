@@ -1,4 +1,4 @@
-import RepoNavbar from "../components/RepoNavbar";
+import RepoNavbar from "../../components/RepoNavbar.tsx";
 
 export type IssuesProps = {
     profile: string;

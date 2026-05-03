@@ -1,11 +1,11 @@
-import RepoNavbar from "../components/RepoNavbar";
-import FileList from "../components/FileList.tsx";
+import RepoNavbar from "../../components/RepoNavbar.tsx";
+import FileList from "../../components/FileList.tsx";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch } from "solid-js";
-import { getOctokit, parseRestOctokitResponse } from "../lib/octokit.ts";
+import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
 import { approximateNumber as approx } from "approximate-number";
-import Octicon from "../components/Octicon.tsx";
-import {repoHref} from "../lib/hrefGen.ts";
+import Octicon from "../../components/Octicon.tsx";
+import {repoHref} from "../../lib/hrefGen.ts";
 
 export type RepositoryProps = {
     profile: string;

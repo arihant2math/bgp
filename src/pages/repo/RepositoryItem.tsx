@@ -1,10 +1,10 @@
 import {useQuery} from "@tanstack/solid-query";
-import {getOctokit, parseRestOctokitResponse} from "../lib/octokit.ts";
-import RepoNavbar from "../components/RepoNavbar.tsx";
+import {getOctokit, parseRestOctokitResponse} from "../../lib/octokit.ts";
+import RepoNavbar from "../../components/RepoNavbar.tsx";
 import {For, Match, Switch} from "solid-js";
-import FileList from "../components/FileList.tsx";
-import CodeRenderer from "../components/CodeRenderer.tsx";
-import {repoHref} from "../lib/hrefGen.ts";
+import FileList from "../../components/FileList.tsx";
+import CodeRenderer from "../../components/CodeRenderer.tsx";
+import {repoHref} from "../../lib/hrefGen.ts";
 
 export type RepositoryItemProps = {
     profile: string;
