@@ -1,8 +1,9 @@
 import RepoNavbar from "../components/RepoNavbar";
+import FileList from "../components/FileList.tsx";
 import { useQuery } from "@tanstack/solid-query";
-import {For, Match, Show, Switch} from "solid-js";
+import { For, Match, Show, Switch } from "solid-js";
 import { getOctokit, parseRestOctokitResponse } from "../lib/octokit.ts";
-import { approximateNumber as approx } from 'approximate-number';
+import { approximateNumber as approx } from "approximate-number";
 import Octicon from "../components/Octicon.tsx";
 
 export type RepositoryProps = {
@@ -16,14 +17,6 @@ function Repository(props: RepositoryProps) {
         queryFn: () =>
             getOctokit()
                 .rest.repos.get({ owner: props.profile, repo: props.repo })
-                .then((res) => parseRestOctokitResponse(res)),
-    }));
-
-    let contentsQuery = useQuery(() => ({
-        queryKey: ["contents", props.profile, props.repo],
-        queryFn: () =>
-            getOctokit()
-                .rest.repos.getContent({ owner: props.profile, repo: props.repo, path: "" })
                 .then((res) => parseRestOctokitResponse(res)),
     }));
 
@@ -52,31 +45,7 @@ function Repository(props: RepositoryProps) {
                         <div class="flex flex-row">
                             <div class="flex-3">
                                 <div>{metadataQuery.data.default_branch} {metadataQuery.data.default_branch}</div>
-                                <Switch>
-                                    <Match when={contentsQuery.isPending}>Loading ...</Match>
-                                    <Match when={contentsQuery.isError}>Error</Match>
-                                    <Match when={contentsQuery.isSuccess}>
-                                        <ul class="list">
-                                            <For each={contentsQuery.data}>
-                                                {(item, index) =>
-                                                    <li class="list-row">
-                                                        <a href="#" class="flex items-center gap-2">
-                                                            <Switch>
-                                                                <Match when={item.type === "dir"}>
-                                                                    <Octicon name="file-directory" size={16} aria-hidden="true" />
-                                                                </Match>
-                                                                <Match when={item.type === "file"}>
-                                                                    <Octicon name="file" size={16} aria-hidden="true" />
-                                                                </Match>
-                                                            </Switch>
-                                                            {item.name}
-                                                        </a>
-                                                    </li>
-                                                }
-                                            </For>
-                                        </ul>
-                                    </Match>
-                                </Switch>
+                                <FileList profile={props.profile} repo={props.repo} />
                             </div>
                             <div class="flex-1 flex flex-col gap-4">
                                 <div>
@@ -89,7 +58,7 @@ function Repository(props: RepositoryProps) {
                                 </Show>
                                 <div class="flex flex-wrap items-start gap-2">
                                     <For each={metadataQuery.data.topics}>
-                                        {(item, index) =>
+                                        {(item) =>
                                             <div class="badge badge-info badge-outline w-fit text-xs">{item}</div>
                                         }
                                     </For>
