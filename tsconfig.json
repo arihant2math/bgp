@@ -8,6 +8,9 @@
         "baseUrl": ".",
         "paths": {
             "@primer/solid": ["./node_modules/@primer/solid/src/index.ts"],
+            "@primer/solid/octicon": [
+                "./node_modules/@primer/solid/src/components/Octicon/index.ts"
+            ],
             "@primer/solid/styles.css": [
                 "./node_modules/@primer/solid/src/styles.css"
             ]

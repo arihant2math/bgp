@@ -1,9 +1,9 @@
 import { useSearchParams } from "@solidjs/router";
 import { Button, ButtonBase } from "@primer/solid";
+import { Octicon } from "@primer/solid/octicon";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo, type JSX } from "solid-js";
 import { format } from "timeago.js";
-import Octicon from "./Octicon.tsx";
 import RepoPageLayout from "./RepoPageLayout.tsx";
 import {
     SEARCH_RESULT_LIMIT,

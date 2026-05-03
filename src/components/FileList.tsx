@@ -2,7 +2,7 @@ import { createMemo, For, Show } from "solid-js";
 import { format } from "timeago.js";
 import type { CommitSummary } from "../lib/githubCommits.ts";
 import CommitListItem from "./CommitListItem.tsx";
-import Octicon from "./Octicon.tsx";
+import { Octicon } from "@primer/solid/octicon";
 
 const commitCountFormatter = new Intl.NumberFormat();
 

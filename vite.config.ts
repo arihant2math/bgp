@@ -14,8 +14,17 @@ const base =
 const primerSolidSource = fileURLToPath(
     new URL("./node_modules/@primer/solid/src/index.ts", import.meta.url),
 );
+const primerSolidOcticon = fileURLToPath(
+    new URL(
+        "./node_modules/@primer/solid/src/components/Octicon/index.ts",
+        import.meta.url,
+    ),
+);
 const primerSolidStyles = fileURLToPath(
     new URL("./node_modules/@primer/solid/src/styles.css", import.meta.url),
+);
+const primerOcticonsData = fileURLToPath(
+    new URL("./node_modules/@primer/octicons/build/data.json", import.meta.url),
 );
 
 export default defineConfig({
@@ -26,6 +35,14 @@ export default defineConfig({
     },
     resolve: {
         alias: [
+            {
+                find: "@primer/octicons",
+                replacement: primerOcticonsData,
+            },
+            {
+                find: "@primer/solid/octicon",
+                replacement: primerSolidOcticon,
+            },
             {
                 find: "@primer/solid/styles.css",
                 replacement: primerSolidStyles,

@@ -2,7 +2,7 @@ import { createMemo, type Component, For, Show } from "solid-js";
 import { useLocation } from "@solidjs/router";
 import { appHref, stripAppBase } from "../lib/baseUrl.ts";
 import { profileHref, repoHref } from "../lib/hrefGen.ts";
-import Octicon from "./Octicon.tsx";
+import { Octicon } from "@primer/solid/octicon";
 
 export type MainNavbarBreadcrumb = {
     label: string;

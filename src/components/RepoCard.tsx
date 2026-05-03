@@ -1,7 +1,7 @@
 import type { Component } from "solid-js";
 import { Show } from "solid-js";
 import approx from "approximate-number";
-import Octicon from "./Octicon.tsx";
+import { Octicon } from "@primer/solid/octicon";
 import { repoHref } from "../lib/hrefGen.ts";
 
 export type RepoCardProps = {

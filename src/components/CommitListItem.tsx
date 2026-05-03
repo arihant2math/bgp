@@ -1,9 +1,9 @@
 import { Button } from "@primer/solid";
+import { Octicon } from "@primer/solid/octicon";
 import { createMemo, createSignal, For, Show } from "solid-js";
 import { format } from "timeago.js";
 import type { CommitAuthor, CommitSummary } from "../lib/githubCommits.ts";
 import Avatar from "./Avatar.tsx";
-import Octicon from "./Octicon.tsx";
 
 export type CommitListItemProps = {
     commit?: CommitSummary | null;

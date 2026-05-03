@@ -10,7 +10,6 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "@primer/octicons": "^19.25.0",
         "@primer/solid": "github:arihant2math/primer-solid",
         "@solidjs/router": "^0.16.1",
         "@tailwindcss/vite": "^4.2.4",

@@ -1,5 +1,5 @@
 import type { Component } from "solid-js";
-import Octicon from "./Octicon.tsx";
+import { Octicon } from "@primer/solid/octicon";
 import { profileHref } from "../lib/hrefGen.ts";
 
 export type OrganizationTab = "overview" | "repositories" | "teams" | "people";

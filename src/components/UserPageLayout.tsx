@@ -1,9 +1,9 @@
-import { type JSX, Show } from "solid-js";
 import { Button } from "@primer/solid";
+import { Octicon } from "@primer/solid/octicon";
+import { type JSX, Show } from "solid-js";
 import Avatar from "./Avatar.tsx";
 import UserNavbar from "./UserNavbar.tsx";
 import type { UserTab } from "./UserNavbar.tsx";
-import Octicon from "./Octicon.tsx";
 
 export type UserPageLayoutProps = {
     profile: string;

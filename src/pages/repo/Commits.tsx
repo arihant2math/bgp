@@ -1,9 +1,9 @@
 import { useSearchParams } from "@solidjs/router";
 import { Button } from "@primer/solid";
+import { Octicon } from "@primer/solid/octicon";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo } from "solid-js";
 import Avatar from "../../components/Avatar.tsx";
-import Octicon from "../../components/Octicon.tsx";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 import { fetchCommitHistory } from "../../lib/githubCommits.ts";
 import type { CommitSummary } from "../../lib/githubCommits.ts";
