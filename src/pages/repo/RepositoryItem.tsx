@@ -4,19 +4,9 @@ import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 import { For, Match, Show, Switch } from "solid-js";
 import FileList from "../../components/FileList.tsx";
 import FileRenderer from "../../components/FileRenderer.tsx";
-import { repoHref } from "../../lib/hrefGen.ts";
+import { repoCommitsHref, repoHref } from "../../lib/hrefGen.ts";
 import { decodeBase64Content } from "../../lib/content.ts";
 import { fetchDirectoryCommitMetadata } from "../../lib/githubCommits.ts";
-
-function githubCommitsHref(
-    profile: string,
-    repo: string,
-    tree: string,
-    path: string[],
-) {
-    const suffix = path.length > 0 ? `/${path.join("/")}` : "";
-    return `https://github.com/${profile}/${repo}/commits/${tree}${suffix}`;
-}
 
 export type RepositoryItemProps = {
     profile: string;
@@ -154,7 +144,7 @@ function RepositoryItem(props: RepositoryItemProps) {
                                                   ?.itemCommitsByPath
                                     }
                                     historyLabel="History"
-                                    historyHref={githubCommitsHref(
+                                    historyHref={repoCommitsHref(
                                         props.profile,
                                         props.repo,
                                         props.tree,

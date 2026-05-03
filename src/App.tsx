@@ -8,6 +8,7 @@ import Notifications from "./pages/Notifications";
 import Profile from "./pages/Profile";
 import Pulls from "./pages/repo/Pulls.tsx";
 import Repository from "./pages/repo/Repository.tsx";
+import Commits from "./pages/repo/Commits.tsx";
 import RepositoryItem from "./pages/repo/RepositoryItem.tsx";
 import MainNavbar from "./components/MainNavbar.tsx";
 
@@ -78,6 +79,34 @@ function App() {
                 path="/:profile/:repo/tree/:tree/*path"
                 component={requireAuth((props) => (
                     <RepositoryItem
+                        profile={props.params.profile ?? ""}
+                        repo={props.params.repo ?? ""}
+                        tree={props.params.tree ?? ""}
+                        path={
+                            Array.isArray(props.params.path)
+                                ? props.params.path
+                                : props.params.path
+                                  ? [props.params.path]
+                                  : []
+                        }
+                    />
+                ))}
+            />
+            <Route
+                path="/:profile/:repo/commits/:tree"
+                component={requireAuth((props) => (
+                    <Commits
+                        profile={props.params.profile ?? ""}
+                        repo={props.params.repo ?? ""}
+                        tree={props.params.tree ?? ""}
+                        path={[]}
+                    />
+                ))}
+            />
+            <Route
+                path="/:profile/:repo/commits/:tree/*path"
+                component={requireAuth((props) => (
+                    <Commits
                         profile={props.params.profile ?? ""}
                         repo={props.params.repo ?? ""}
                         tree={props.params.tree ?? ""}

@@ -24,6 +24,12 @@ export type DirectoryCommitMetadata = {
     itemCommitsByPath: Record<string, CommitSummary | null>;
 };
 
+export type CommitHistoryPage = {
+    commits: CommitSummary[];
+    hasPrevious: boolean;
+    hasNext: boolean;
+};
+
 type GraphQLUser = {
     login?: string | null;
     avatarUrl?: string | null;
@@ -137,6 +143,65 @@ function firstCommit(connection?: GraphQLHistoryConnection | null) {
     return normalizeCommit(
         connection?.nodes?.find((commit) => commit !== null),
     );
+}
+
+function hasLinkRel(linkHeader: string | undefined, rel: string) {
+    return linkHeader?.includes(`rel="${rel}"`) ?? false;
+}
+
+function normalizeRestCommit(commit: any): CommitSummary {
+    const author = commit.author;
+    const gitAuthor = commit.commit?.author;
+    const name =
+        author?.login ?? gitAuthor?.name ?? gitAuthor?.email ?? "Unknown author";
+    const message = commit.commit?.message?.split(/\r?\n/, 1)[0]?.trim();
+
+    return {
+        oid: commit.sha,
+        abbreviatedOid: commit.sha.slice(0, 7),
+        message: message || "No commit message",
+        committedDate:
+            commit.commit?.committer?.date ??
+            gitAuthor?.date ??
+            new Date(0).toISOString(),
+        commitUrl: commit.html_url ?? undefined,
+        authors: [
+            {
+                name,
+                login: author?.login ?? undefined,
+                email: gitAuthor?.email ?? undefined,
+                avatarUrl: author?.avatar_url ?? undefined,
+                url: author?.html_url ?? undefined,
+            },
+        ],
+        authorTotalCount: 1,
+    };
+}
+
+export async function fetchCommitHistory(params: {
+    owner: string;
+    repo: string;
+    ref: string;
+    path?: string | null;
+    page: number;
+    perPage: number;
+}): Promise<CommitHistoryPage> {
+    const response = await getOctokit().rest.repos.listCommits({
+        owner: params.owner,
+        repo: params.repo,
+        sha: params.ref,
+        path: params.path || undefined,
+        page: params.page,
+        per_page: params.perPage,
+    });
+
+    const linkHeader = response.headers.link;
+
+    return {
+        commits: response.data.map(normalizeRestCommit),
+        hasPrevious: params.page > 1 || hasLinkRel(linkHeader, "prev"),
+        hasNext: hasLinkRel(linkHeader, "next"),
+    };
 }
 
 export async function fetchDirectoryCommitMetadata(params: {

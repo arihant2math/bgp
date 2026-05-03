@@ -7,13 +7,9 @@ import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
 import { approximateNumber as approx } from "approximate-number";
 import Octicon from "../../components/Octicon.tsx";
 import Avatar from "../../components/Avatar.tsx";
-import { repoHref } from "../../lib/hrefGen.ts";
+import { repoCommitsHref, repoHref } from "../../lib/hrefGen.ts";
 import { decodeBase64Content } from "../../lib/content.ts";
 import { fetchDirectoryCommitMetadata } from "../../lib/githubCommits.ts";
-
-function githubCommitsHref(profile: string, repo: string, tree: string) {
-    return `https://github.com/${profile}/${repo}/commits/${tree}`;
-}
 
 export type RepositoryProps = {
     profile: string;
@@ -196,7 +192,7 @@ function Repository(props: RepositoryProps) {
                                                     ? undefined
                                                     : "History"
                                             }
-                                            historyHref={githubCommitsHref(
+                                            historyHref={repoCommitsHref(
                                                 props.profile,
                                                 props.repo,
                                                 props.tree ??
