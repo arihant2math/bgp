@@ -1,4 +1,4 @@
-import {type Component, For} from "solid-js";
+import {type Component, For, Show} from "solid-js";
 import {Dynamic} from "solid-js/web";
 
 export type MainNavbarBreadcrumb = {
@@ -16,11 +16,16 @@ const MainNavbar: Component<MainNavbarProps> = (props) => {
             <div class="flex-1">
                 <a href="/">TODO Icon</a>
                 <For each={props.breadcrumbs}>
-                    {(breadcrumb) => (
-                        <div>
-                            <span class="mx-2">/</span>
-                            <a href={breadcrumb.href}><Dynamic component={breadcrumb.link}/></a>
-                        </div>
+                    {(breadcrumb, index) => (
+                        <>
+                            <div>
+                                <span class="mx-2">/</span>
+                                <a href={breadcrumb.href}><Dynamic component={breadcrumb.link}/></a>
+                            </div>
+                            <Show when={index() < props.breadcrumbs.length - 1}>
+                                /
+                            </Show>
+                        </>
                     )}
                 </For>
             </div>
