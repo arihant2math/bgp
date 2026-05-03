@@ -1,5 +1,5 @@
-import RepoNavbar from "../../components/RepoNavbar.tsx";
 import FileList from "../../components/FileList.tsx";
+import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch } from "solid-js";
 import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
@@ -31,19 +31,13 @@ function Repository(props: RepositoryProps) {
                 .then((res) => parseRestOctokitResponse(res)),
     }));
 
-    // TODO: abstract out RepoNavbar and <div class="flex flex-col mx-8"> for all /profile/repo routes
     return (
-        <main>
-            <RepoNavbar
-                profile={props.profile}
-                repo={props.repo}
-                active="code"
-            />
+        <RepoPageLayout profile={props.profile} repo={props.repo} active="code">
             <Switch>
                 <Match when={metadataQuery.isPending}>Loading ...</Match>
                 <Match when={metadataQuery.isError}>Error</Match>
                 <Match when={metadataQuery.isSuccess}>
-                    <div class="flex flex-col mx-8">
+                    <>
                         <div class="flex min-h-12 flex-row items-center gap-2">
                             <h1 class="text-xl">{metadataQuery.data.name}</h1>
                             <div class="badge badge-neutral badge-outline text-xs">{metadataQuery.data.visibility}</div>
@@ -92,10 +86,10 @@ function Repository(props: RepositoryProps) {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </>
                 </Match>
             </Switch>
-        </main>
+        </RepoPageLayout>
     );
 }
 

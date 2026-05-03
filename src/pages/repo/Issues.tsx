@@ -1,4 +1,4 @@
-import RepoNavbar from "../../components/RepoNavbar.tsx";
+import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 
 export type IssuesProps = {
     profile: string;
@@ -7,13 +7,7 @@ export type IssuesProps = {
 
 function Issues(props: IssuesProps) {
     return (
-        <main>
-            <RepoNavbar
-                profile={props.profile}
-                repo={props.repo}
-                active="issues"
-            />
-        </main>
+        <RepoPageLayout profile={props.profile} repo={props.repo} active="issues" />
     );
 }
 

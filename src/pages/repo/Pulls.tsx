@@ -1,4 +1,4 @@
-import RepoNavbar from "../../components/RepoNavbar.tsx";
+import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 
 export type PullsProps = {
     profile: string;
@@ -7,13 +7,7 @@ export type PullsProps = {
 
 function Pulls(props: PullsProps) {
     return (
-        <main>
-            <RepoNavbar
-                profile={props.profile}
-                repo={props.repo}
-                active="pulls"
-            />
-        </main>
+        <RepoPageLayout profile={props.profile} repo={props.repo} active="pulls" />
     );
 }
 
