@@ -25,7 +25,7 @@ function Profile(props: ProfileProps) {
                 <OrganizationPageLayout profile={props.profile} active="overview" />
             </Match>
             <Match when={profileQuery.isSuccess}>
-                <UserPageLayout profile={props.profile} active="overview" />
+                <UserPageLayout profile={props.profile} profileData={profileQuery} active="overview" />
             </Match>
         </Switch>
     );

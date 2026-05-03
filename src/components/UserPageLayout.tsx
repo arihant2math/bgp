@@ -1,9 +1,11 @@
 import type { JSX } from "solid-js";
+import Avatar from "./Avatar.tsx";
 import UserNavbar from "./UserNavbar.tsx";
 import type { UserTab } from "./UserNavbar.tsx";
 
 export type UserPageLayoutProps = {
     profile: string;
+    profileData: any;
     active: UserTab;
     children?: JSX.Element;
 };
@@ -12,7 +14,18 @@ function UserPageLayout(props: UserPageLayoutProps) {
     return (
         <main>
             <UserNavbar profile={props.profile} active={props.active} />
-            <div class="flex flex-col mx-8">{props.children}</div>
+            <div class="flex gap-8 mx-8 mt-8">
+                <aside class="w-72 shrink-0">
+                    <Avatar
+                        href={props.profileData.data.avatar_url}
+                        size={296}
+                        alt={`${props.profile}'s avatar`}
+                        class="border border-base-300 bg-base-200"
+                    />
+                    <h1 class="text-2xl">{props.profileData.data.name}</h1>
+                </aside>
+                <div class="flex-1">{props.children}</div>
+            </div>
         </main>
     );
 }
