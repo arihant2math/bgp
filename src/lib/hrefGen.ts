@@ -1,4 +1,3 @@
-
 export function profileHref(profile: string, suffix = "") {
     const base = `/${encodeURIComponent(profile)}`;
     return `${base}${suffix}`;

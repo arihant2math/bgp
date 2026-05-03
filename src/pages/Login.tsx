@@ -20,7 +20,10 @@ function Login() {
 
     return (
         <main class="min-h-screen overflow-hidden">
-            <form onSubmit={handleSubmit} class="flex flex-col max-w-md gap-2 items-center justify-center">
+            <form
+                onSubmit={handleSubmit}
+                class="flex flex-col max-w-md gap-2 items-center justify-center"
+            >
                 <input
                     class="border rounded-md border-black p-1"
                     type="password"
@@ -28,9 +31,22 @@ function Login() {
                     onInput={(event) => setToken(event.currentTarget.value)}
                     autocomplete="off"
                 />
-                <button class="bg-blue-500 text-white rounded-md w-fit p-1" type="submit">Login</button>
-                <p>Create a personal auth token
-                    (<a class="text-blue-500 hover-text-blue-600" href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token">Docs</a>)</p>
+                <button
+                    class="bg-blue-500 text-white rounded-md w-fit p-1"
+                    type="submit"
+                >
+                    Login
+                </button>
+                <p>
+                    Create a personal auth token (
+                    <a
+                        class="text-blue-500 hover-text-blue-600"
+                        href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token"
+                    >
+                        Docs
+                    </a>
+                    )
+                </p>
             </form>
         </main>
     );

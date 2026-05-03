@@ -57,9 +57,14 @@ function inferLanguage(path?: string) {
     if (!path) return "text";
 
     const filename = path.split("/").pop()?.toLowerCase() ?? "";
-    const extension = filename.includes(".") ? filename.split(".").pop() : undefined;
+    const extension = filename.includes(".")
+        ? filename.split(".").pop()
+        : undefined;
 
-    return filenameLanguages[filename] ?? (extension ? extensionLanguages[extension] ?? extension : "text");
+    return (
+        filenameLanguages[filename] ??
+        (extension ? (extensionLanguages[extension] ?? extension) : "text")
+    );
 }
 
 async function renderCode(
@@ -69,7 +74,9 @@ async function renderCode(
     theme: BundledTheme = defaultTheme,
 ) {
     const requestedLanguage = (language ?? inferLanguage(path)).toLowerCase();
-    const shikiLanguage = isBundledLanguage(requestedLanguage) ? requestedLanguage : "text";
+    const shikiLanguage = isBundledLanguage(requestedLanguage)
+        ? requestedLanguage
+        : "text";
     const highlighter = await getHighlighter();
 
     if (shikiLanguage !== "text") {
@@ -88,12 +95,21 @@ async function renderCode(
 
 function CodeRenderer(props: CodeRendererProps) {
     const [html] = createResource(
-        () => [props.code, props.language, props.path, props.theme ?? defaultTheme] as const,
-        ([code, language, path, theme]) => renderCode(code, language, path, theme),
+        () =>
+            [
+                props.code,
+                props.language,
+                props.path,
+                props.theme ?? defaultTheme,
+            ] as const,
+        ([code, language, path, theme]) =>
+            renderCode(code, language, path, theme),
     );
 
     return (
-        <div class={`code-renderer overflow-hidden rounded-md border border-base-300 bg-base-100 ${props.class ?? ""}`}>
+        <div
+            class={`code-renderer overflow-hidden rounded-md border border-base-300 bg-base-100 ${props.class ?? ""}`}
+        >
             <Show
                 when={html()}
                 fallback={
@@ -102,7 +118,9 @@ function CodeRenderer(props: CodeRendererProps) {
                     </pre>
                 }
             >
-                {(renderedHtml) => <div class="overflow-x-auto" innerHTML={renderedHtml()} />}
+                {(renderedHtml) => (
+                    <div class="overflow-x-auto" innerHTML={renderedHtml()} />
+                )}
             </Show>
         </div>
     );

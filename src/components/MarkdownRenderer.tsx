@@ -8,7 +8,10 @@ export type MarkdownRendererProps = {
     class?: string;
 };
 
-async function renderMarkdown(markdown: string, context?: `${string}/${string}`) {
+async function renderMarkdown(
+    markdown: string,
+    context?: `${string}/${string}`,
+) {
     if (markdown.trim().length === 0) {
         return "";
     }
@@ -29,16 +32,23 @@ function MarkdownRenderer(props: MarkdownRendererProps) {
     }));
 
     return (
-        <div class={`markdown-renderer rounded-md border border-base-300 bg-base-100 ${props.class ?? ""}`}>
+        <div
+            class={`markdown-renderer rounded-md border border-base-300 bg-base-100 ${props.class ?? ""}`}
+        >
             <Switch>
                 <Match when={htmlQuery.isPending}>
                     <div class="flex items-center gap-3 p-4 text-sm text-base-content/70">
-                        <span class="loading loading-spinner loading-sm" aria-hidden="true" />
+                        <span
+                            class="loading loading-spinner loading-sm"
+                            aria-hidden="true"
+                        />
                         Rendering markdown…
                     </div>
                 </Match>
                 <Match when={htmlQuery.isError}>
-                    <div class="p-4 text-sm text-error">Could not render markdown from GitHub.</div>
+                    <div class="p-4 text-sm text-error">
+                        Could not render markdown from GitHub.
+                    </div>
                 </Match>
                 <Match when={htmlQuery.isSuccess}>
                     <article class="markdown-body" innerHTML={htmlQuery.data} />

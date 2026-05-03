@@ -34,8 +34,12 @@ function Profile(props: ProfileProps) {
         <section>
             <h2 class="mb-3 font-semibold">Repositories</h2>
             <Switch>
-                <Match when={repositoriesQuery.isPending}>Loading repositories...</Match>
-                <Match when={repositoriesQuery.isError}>Error loading repositories</Match>
+                <Match when={repositoriesQuery.isPending}>
+                    Loading repositories...
+                </Match>
+                <Match when={repositoriesQuery.isError}>
+                    Error loading repositories
+                </Match>
                 <Match when={repositoriesQuery.isSuccess}>
                     <div class="grid gap-4 md:grid-cols-2">
                         <For each={repositoriesQuery.data}>
@@ -65,13 +69,25 @@ function Profile(props: ProfileProps) {
         <Switch>
             <Match when={profileQuery.isPending}>Loading ...</Match>
             <Match when={profileQuery.isError}>Error</Match>
-            <Match when={profileQuery.isSuccess && profileQuery.data.type === "Organization"}>
-                <OrganizationPageLayout profile={props.profile} active="overview">
+            <Match
+                when={
+                    profileQuery.isSuccess &&
+                    profileQuery.data.type === "Organization"
+                }
+            >
+                <OrganizationPageLayout
+                    profile={props.profile}
+                    active="overview"
+                >
                     {repositoryCards()}
                 </OrganizationPageLayout>
             </Match>
             <Match when={profileQuery.isSuccess}>
-                <UserPageLayout profile={props.profile} profileData={profileQuery} active="overview">
+                <UserPageLayout
+                    profile={props.profile}
+                    profileData={profileQuery}
+                    active="overview"
+                >
                     {repositoryCards()}
                 </UserPageLayout>
             </Match>

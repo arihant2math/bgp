@@ -1,4 +1,4 @@
-import {createMemo, type Component, For, Show} from "solid-js";
+import { createMemo, type Component, For, Show } from "solid-js";
 import { useLocation } from "@solidjs/router";
 import { profileHref, repoHref } from "../lib/hrefGen.ts";
 import Octicon from "./Octicon.tsx";
@@ -29,7 +29,9 @@ const MainNavbar: Component<MainNavbarProps> = (props) => {
             return props.breadcrumbs;
         }
 
-        const [profileSegment, repoSegment] = location.pathname.split("/").filter(Boolean);
+        const [profileSegment, repoSegment] = location.pathname
+            .split("/")
+            .filter(Boolean);
 
         if (!profileSegment || ROOT_ROUTES.has(profileSegment)) {
             return [];
@@ -51,15 +53,18 @@ const MainNavbar: Component<MainNavbarProps> = (props) => {
     return (
         <nav class="navbar bg-base-100 shadow-sm">
             <div class="flex-1 flex items-center gap-2">
-                <a href="/"><Octicon name="mark-github" size={32} aria-hidden="true"/></a>
+                <a href="/">
+                    <Octicon name="mark-github" size={32} aria-hidden="true" />
+                </a>
                 <div>
                     <For each={breadcrumbs()}>
                         {(breadcrumb, index) => (
                             <>
-
                                 <a href={breadcrumb.href}>{breadcrumb.label}</a>
                                 <Show when={index() < breadcrumbs().length - 1}>
-                                    <span class="mx-2 text-base-content/50">/</span>
+                                    <span class="mx-2 text-base-content/50">
+                                        /
+                                    </span>
                                 </Show>
                             </>
                         )}
@@ -67,7 +72,11 @@ const MainNavbar: Component<MainNavbarProps> = (props) => {
                 </div>
             </div>
             <div class="flex gap-2">
-                <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
+                <input
+                    type="text"
+                    placeholder="Search"
+                    class="input input-bordered w-24 md:w-auto"
+                />
             </div>
         </nav>
     );

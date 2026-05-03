@@ -1,6 +1,6 @@
 import type { Component } from "solid-js";
 import Octicon from "./Octicon.tsx";
-import {profileHref} from "../lib/hrefGen.ts";
+import { profileHref } from "../lib/hrefGen.ts";
 
 export type OrganizationTab = "overview" | "repositories" | "teams" | "people";
 
@@ -17,7 +17,10 @@ const OrganizationNavbar: Component<OrganizationNavbarProps> = (props) => {
     return (
         <nav>
             <div role="tablist" class="tabs tabs-border">
-                <a href={profileHref(props.profile)} class={tabClass(props, "overview")}>
+                <a
+                    href={profileHref(props.profile)}
+                    class={tabClass(props, "overview")}
+                >
                     <Octicon name="book" size={16} aria-hidden="true" />
                     Overview
                 </a>

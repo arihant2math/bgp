@@ -7,7 +7,11 @@ export type PullsProps = {
 
 function Pulls(props: PullsProps) {
     return (
-        <RepoPageLayout profile={props.profile} repo={props.repo} active="pulls" />
+        <RepoPageLayout
+            profile={props.profile}
+            repo={props.repo}
+            active="pulls"
+        />
     );
 }
 

@@ -7,7 +7,11 @@ export type IssuesProps = {
 
 function Issues(props: IssuesProps) {
     return (
-        <RepoPageLayout profile={props.profile} repo={props.repo} active="issues" />
+        <RepoPageLayout
+            profile={props.profile}
+            repo={props.repo}
+            active="issues"
+        />
     );
 }
 

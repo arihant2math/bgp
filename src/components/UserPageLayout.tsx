@@ -1,4 +1,4 @@
-import {type JSX, Show} from "solid-js";
+import { type JSX, Show } from "solid-js";
 import Avatar from "./Avatar.tsx";
 import UserNavbar from "./UserNavbar.tsx";
 import type { UserTab } from "./UserNavbar.tsx";
@@ -29,7 +29,14 @@ function UserPageLayout(props: UserPageLayoutProps) {
                         <button class="btn w-full">Follow</button>
                         <p>{props.profileData.data.bio}</p>
                         <Show when={props.profileData.data.location !== null}>
-                            <div class="flex items-center flex-row gap-2"><Octicon name="location" size={16} aria-hidden="true" /> {props.profileData.data.location}</div>
+                            <div class="flex items-center flex-row gap-2">
+                                <Octicon
+                                    name="location"
+                                    size={16}
+                                    aria-hidden="true"
+                                />{" "}
+                                {props.profileData.data.location}
+                            </div>
                         </Show>
                         {/*<p>{JSON.stringify(props.profileData.data)}</p>*/}
                     </div>

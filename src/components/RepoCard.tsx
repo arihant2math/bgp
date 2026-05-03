@@ -30,7 +30,10 @@ const RepoCard: Component<RepoCardProps> = (props) => {
                         class="shrink-0 opacity-80"
                         aria-hidden="true"
                     />
-                    <a href={href()} class="font-semibold text-xl link link-hover leading-tight">
+                    <a
+                        href={href()}
+                        class="font-semibold text-xl link link-hover leading-tight"
+                    >
                         {props.owner}/{props.name}
                     </a>
                     <span class="badge badge-outline rounded-full capitalize font-semibold">
@@ -38,14 +41,19 @@ const RepoCard: Component<RepoCardProps> = (props) => {
                     </span>
                 </div>
                 <Show when={props.description}>
-                    <p class="mt-4 text-lg opacity-80 leading-snug">{props.description}</p>
+                    <p class="mt-4 text-lg opacity-80 leading-snug">
+                        {props.description}
+                    </p>
                 </Show>
             </div>
 
             <div class="mt-12 flex items-center gap-8 text-lg opacity-90">
                 <Show when={props.language}>
                     <span class="flex items-center gap-2">
-                        <span class="size-4 rounded-full border border-current opacity-60" aria-hidden="true" />
+                        <span
+                            class="size-4 rounded-full border border-current opacity-60"
+                            aria-hidden="true"
+                        />
                         {props.language}
                     </span>
                 </Show>
@@ -57,7 +65,11 @@ const RepoCard: Component<RepoCardProps> = (props) => {
                 </Show>
                 <Show when={(props.forks ?? 0) > 0}>
                     <span class="flex items-center gap-2">
-                        <Octicon name="repo-forked" size={24} aria-hidden="true" />
+                        <Octicon
+                            name="repo-forked"
+                            size={24}
+                            aria-hidden="true"
+                        />
                         {approx(props.forks ?? 0)}
                     </span>
                 </Show>

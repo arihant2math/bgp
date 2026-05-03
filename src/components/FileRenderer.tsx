@@ -10,8 +10,11 @@ export type FileRendererProps = {
 };
 
 function isMarkdownFile(path: string) {
-    return /(?:^|\/)(?:readme|license|contributing|code_of_conduct|security|support)(?:\.[^.]+)?$/i.test(path)
-        || /\.(?:md|markdown|mdown|mkdn|mkd)$/i.test(path);
+    return (
+        /(?:^|\/)(?:readme|license|contributing|code_of_conduct|security|support)(?:\.[^.]+)?$/i.test(
+            path,
+        ) || /\.(?:md|markdown|mdown|mkdn|mkd)$/i.test(path)
+    );
 }
 
 function FileRenderer(props: FileRendererProps) {

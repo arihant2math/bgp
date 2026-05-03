@@ -20,7 +20,10 @@ type OcticonProps = Omit<
 
 const DEFAULT_HEIGHT = 16;
 
-function closestNaturalHeight(naturalHeights: string[], requestedHeight: number) {
+function closestNaturalHeight(
+    naturalHeights: string[],
+    requestedHeight: number,
+) {
     return naturalHeights
         .map((height) => Number.parseInt(height, 10))
         .reduce(
@@ -42,7 +45,7 @@ const Octicon: Component<OcticonProps> = (props) => {
         "aria-hidden",
         "role",
         "stroke",
-        "fill"
+        "fill",
     ]);
 
     const icon = () => octicons[local.name];

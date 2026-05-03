@@ -12,9 +12,7 @@ function OrganizationPageLayout(props: OrganizationPageLayoutProps) {
     return (
         <main>
             <OrganizationNavbar profile={props.profile} active={props.active} />
-            <div class="max-w-6xl mx-auto mt-8">
-                {props.children}
-            </div>
+            <div class="max-w-6xl mx-auto mt-8">{props.children}</div>
         </main>
     );
 }

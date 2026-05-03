@@ -1,6 +1,6 @@
 import type { Component } from "solid-js";
 import Octicon from "./Octicon.tsx";
-import {repoHref} from "../lib/hrefGen.ts";
+import { repoHref } from "../lib/hrefGen.ts";
 
 export type RepoTab = "code" | "issues" | "pulls";
 
@@ -18,23 +18,46 @@ const RepoNavbar: Component<RepoNavbarProps> = (props) => {
     return (
         <nav>
             <div role="tablist" class="tabs tabs-border">
-                <a href={repoHref(props.profile, props.repo)} class={tabClass(props, "code")}>
+                <a
+                    href={repoHref(props.profile, props.repo)}
+                    class={tabClass(props, "code")}
+                >
                     <Octicon name="code" size={16} aria-hidden="true" />
                     Code
                 </a>
-                <a href={repoHref(props.profile, props.repo, "/issues")} class={tabClass(props, "issues")}>
+                <a
+                    href={repoHref(props.profile, props.repo, "/issues")}
+                    class={tabClass(props, "issues")}
+                >
                     <Octicon name="issue-opened" size={16} aria-hidden="true" />
                     Issues
                 </a>
-                <a href={repoHref(props.profile, props.repo, "/pulls")} class={tabClass(props, "pulls")}>
-                    <Octicon name="git-pull-request" size={16} aria-hidden="true" />
+                <a
+                    href={repoHref(props.profile, props.repo, "/pulls")}
+                    class={tabClass(props, "pulls")}
+                >
+                    <Octicon
+                        name="git-pull-request"
+                        size={16}
+                        aria-hidden="true"
+                    />
                     Pull Requests
                 </a>
-                <a href={repoHref(props.profile, props.repo, "/discussions")} class={tabClass(props, "discussions")}>
-                    <Octicon name="comment-discussion" size={16} aria-hidden="true" />
+                <a
+                    href={repoHref(props.profile, props.repo, "/discussions")}
+                    class={tabClass(props, "discussions")}
+                >
+                    <Octicon
+                        name="comment-discussion"
+                        size={16}
+                        aria-hidden="true"
+                    />
                     Discussions
                 </a>
-                <a href={repoHref(props.profile, props.repo, "/actions")} class={tabClass(props, "actions")}>
+                <a
+                    href={repoHref(props.profile, props.repo, "/actions")}
+                    class={tabClass(props, "actions")}
+                >
                     <Octicon name="play" size={16} aria-hidden="true" />
                     Actions
                 </a>

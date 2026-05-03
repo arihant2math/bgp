@@ -81,22 +81,17 @@ function FileList(props: FileListProps) {
                                 title={itemCommit()?.message}
                             >
                                 <Show
-                                    when={
-                                        props.itemCommitsByPath !==
-                                        undefined
-                                    }
+                                    when={props.itemCommitsByPath !== undefined}
                                     fallback={
                                         <span class="opacity-50">
-                                                Loading commit…
-                                            </span>
-                                        }
-                                    >
-                                        <Show
-                                            when={itemCommit()}
-                                            fallback={
-                                                <span class="opacity-50">
-                                                    —
-                                                </span>
+                                            Loading commit…
+                                        </span>
+                                    }
+                                >
+                                    <Show
+                                        when={itemCommit()}
+                                        fallback={
+                                            <span class="opacity-50">—</span>
                                         }
                                     >
                                         {(commit) => commit().message}
@@ -105,10 +100,7 @@ function FileList(props: FileListProps) {
                             </div>
                             <div class="shrink-0 text-xs opacity-70">
                                 <Show
-                                    when={
-                                        props.itemCommitsByPath !==
-                                        undefined
-                                    }
+                                    when={props.itemCommitsByPath !== undefined}
                                     fallback={<span>—</span>}
                                 >
                                     <Show
@@ -124,9 +116,7 @@ function FileList(props: FileListProps) {
                                                     commit().committedDate,
                                                 ).toLocaleString()}
                                             >
-                                                {format(
-                                                    commit().committedDate,
-                                                )}
+                                                {format(commit().committedDate)}
                                             </time>
                                         )}
                                     </Show>
