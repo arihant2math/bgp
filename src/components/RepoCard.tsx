@@ -26,28 +26,28 @@ const RepoCard: Component<RepoCardProps> = (props) => {
                 <div class="flex items-center gap-3">
                     <Octicon
                         name={props.isFork ? "repo-forked" : "repo"}
-                        size={24}
+                        size={16}
                         class="shrink-0 opacity-80"
                         aria-hidden="true"
                     />
                     <a
                         href={href()}
-                        class="font-semibold text-xl link link-hover leading-tight"
+                        class="font-semibold text-md link link-hover leading-tight"
                     >
                         {props.owner}/{props.name}
                     </a>
-                    <span class="badge badge-outline rounded-full capitalize font-semibold">
+                    <span class="badge badge-outline badge-sm rounded-full capitalize font-semibold">
                         {visibility()}
                     </span>
                 </div>
                 <Show when={props.description}>
-                    <p class="mt-4 text-lg opacity-80 leading-snug">
+                    <p class="mt-4 text-sm opacity-80 leading-snug">
                         {props.description}
                     </p>
                 </Show>
             </div>
 
-            <div class="mt-12 flex items-center gap-8 text-lg opacity-90">
+            <div class="mt-6 flex items-center gap-8 text-md opacity-90">
                 <Show when={props.language}>
                     <span class="flex items-center gap-2">
                         <span
@@ -59,7 +59,7 @@ const RepoCard: Component<RepoCardProps> = (props) => {
                 </Show>
                 <Show when={(props.stars ?? 0) > 0}>
                     <span class="flex items-center gap-2">
-                        <Octicon name="star" size={24} aria-hidden="true" />
+                        <Octicon name="star" size={16} aria-hidden="true" />
                         {approx(props.stars ?? 0)}
                     </span>
                 </Show>
@@ -67,7 +67,7 @@ const RepoCard: Component<RepoCardProps> = (props) => {
                     <span class="flex items-center gap-2">
                         <Octicon
                             name="repo-forked"
-                            size={24}
+                            size={16}
                             aria-hidden="true"
                         />
                         {approx(props.forks ?? 0)}
