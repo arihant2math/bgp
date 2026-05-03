@@ -6,6 +6,12 @@ import FileList from "../../components/FileList.tsx";
 import FileRenderer from "../../components/FileRenderer.tsx";
 import {repoHref} from "../../lib/hrefGen.ts";
 import { decodeBase64Content } from "../../lib/content.ts";
+import { fetchDirectoryCommitMetadata } from "../../lib/githubCommits.ts";
+
+function githubCommitsHref(profile: string, repo: string, tree: string, path: string[]) {
+    const suffix = path.length > 0 ? `/${path.join("/")}` : "";
+    return `https://github.com/${profile}/${repo}/commits/${tree}${suffix}`;
+}
 
 export type RepositoryItemProps = {
     profile: string;
@@ -33,6 +39,19 @@ function RepositoryItem(props: RepositoryItemProps) {
                 .then((res) => parseRestOctokitResponse(res)),
         enabled: contentsQuery.isSuccess && Array.isArray(contentsQuery.data),
         retry: false,
+    }));
+
+    const commitMetadataQuery = useQuery(() => ({
+        queryKey: ["directoryCommitMetadata", props.profile, props.repo, props.tree, props.path],
+        queryFn: () =>
+            fetchDirectoryCommitMetadata({
+                owner: props.profile,
+                repo: props.repo,
+                ref: props.tree,
+                path: props.path.join("/"),
+                itemPaths: Array.isArray(contentsQuery.data) ? contentsQuery.data.map((item) => item.path) : [],
+            }),
+        enabled: contentsQuery.isSuccess && Array.isArray(contentsQuery.data),
     }));
 
     return (
@@ -66,7 +85,16 @@ function RepositoryItem(props: RepositoryItemProps) {
                     <Switch>
                         <Match when={Array.isArray(contentsQuery.data)}>
                             <>
-                                <FileList contents={contentsQuery.data} tree={props.tree} repoUrl={repoHref(props.profile, props.repo)}/>
+                                <FileList
+                                    contents={contentsQuery.data}
+                                    tree={props.tree}
+                                    repoUrl={repoHref(props.profile, props.repo)}
+                                    latestCommit={commitMetadataQuery.isError ? null : commitMetadataQuery.data?.latestCommit}
+                                    latestCommitTotalCount={commitMetadataQuery.data?.totalCount}
+                                    itemCommitsByPath={commitMetadataQuery.isError ? {} : commitMetadataQuery.data?.itemCommitsByPath}
+                                    historyLabel="History"
+                                    historyHref={githubCommitsHref(props.profile, props.repo, props.tree, props.path)}
+                                />
                                 <Show when={readmeQuery.isSuccess}>
                                     <FileRenderer
                                         content={decodeBase64Content(readmeQuery.data.content)}

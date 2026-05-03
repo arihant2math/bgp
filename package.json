@@ -17,7 +17,8 @@
         "approximate-number": "^3.0.1",
         "octokit": "^5.0.5",
         "solid-js": "^1.9.0",
-        "tailwindcss": "^4.1.0"
+        "tailwindcss": "^4.1.0",
+        "timeago.js": "^4.0.2"
     },
     "devDependencies": {
         "daisyui": "^5.5.19",

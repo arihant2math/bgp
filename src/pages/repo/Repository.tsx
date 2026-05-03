@@ -9,6 +9,11 @@ import Octicon from "../../components/Octicon.tsx";
 import Avatar from "../../components/Avatar.tsx";
 import {repoHref} from "../../lib/hrefGen.ts";
 import { decodeBase64Content } from "../../lib/content.ts";
+import { fetchDirectoryCommitMetadata } from "../../lib/githubCommits.ts";
+
+function githubCommitsHref(profile: string, repo: string, tree: string) {
+    return `https://github.com/${profile}/${repo}/commits/${tree}`;
+}
 
 export type RepositoryProps = {
     profile: string;
@@ -43,6 +48,22 @@ function Repository(props: RepositoryProps) {
         retry: false,
     }));
 
+    const commitMetadataQuery = useQuery(() => {
+        const tree = props.tree ?? metadataQuery.data?.default_branch;
+
+        return {
+            queryKey: ["directoryCommitMetadata", props.profile, props.repo, tree, ""],
+            queryFn: () =>
+                fetchDirectoryCommitMetadata({
+                    owner: props.profile,
+                    repo: props.repo,
+                    ref: tree ?? "",
+                    itemPaths: Array.isArray(contentsQuery.data) ? contentsQuery.data.map((item) => item.path) : [],
+                }),
+            enabled: metadataQuery.isSuccess && contentsQuery.isSuccess && Array.isArray(contentsQuery.data) && Boolean(tree),
+        };
+    });
+
     return (
         <RepoPageLayout profile={props.profile} repo={props.repo} active="code">
             <Switch>
@@ -73,7 +94,16 @@ function Repository(props: RepositoryProps) {
                                     <Match when={contentsQuery.isPending}>Loading ...</Match>
                                     <Match when={contentsQuery.isError}>Error</Match>
                                     <Match when={contentsQuery.isSuccess}>
-                                        <FileList contents={contentsQuery.data} tree={props.tree ?? metadataQuery.data.default_branch} repoUrl={repoHref(props.profile, props.repo)}/>
+                                        <FileList
+                                            contents={contentsQuery.data}
+                                            tree={props.tree ?? metadataQuery.data.default_branch}
+                                            repoUrl={repoHref(props.profile, props.repo)}
+                                            latestCommit={commitMetadataQuery.isError ? null : commitMetadataQuery.data?.latestCommit}
+                                            latestCommitTotalCount={commitMetadataQuery.data?.totalCount}
+                                            itemCommitsByPath={commitMetadataQuery.isError ? {} : commitMetadataQuery.data?.itemCommitsByPath}
+                                            historyLabel={props.tree === null ? undefined : "History"}
+                                            historyHref={githubCommitsHref(props.profile, props.repo, props.tree ?? metadataQuery.data.default_branch)}
+                                        />
                                     </Match>
                                 </Switch>
                                 <Show when={readmeQuery.isSuccess}>
