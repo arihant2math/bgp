@@ -13,6 +13,13 @@ import MainNavbar from "./components/MainNavbar.tsx";
 
 const EmptyPage = () => <main></main>;
 
+const AppLayout: Component<RouteSectionProps> = (props) => (
+    <div>
+        <MainNavbar />
+        {props.children}
+    </div>
+);
+
 const requireAuth = (
     renderPage: (props: RouteSectionProps) => JSX.Element,
 ): Component<RouteSectionProps> => {
@@ -27,9 +34,7 @@ const requireAuth = (
 
 function App() {
     return (
-        <div>
-            <MainNavbar breadcrumbs={[]} />
-            <Router>
+        <Router root={AppLayout}>
             <Route
                 path="/"
                 component={requireAuth(() => (
@@ -105,7 +110,6 @@ function App() {
                 ))}
             />
         </Router>
-    </div>
     );
 }
 
