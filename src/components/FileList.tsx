@@ -19,7 +19,7 @@ function FileList(props: FileListProps) {
     );
 
     return (
-        <ul class="list">
+        <ul class="list rounded-md border border-base-300 bg-base-100 ">
             <For each={sortedContents()}>
                 {(item) => (
                     <li class="list-row">
