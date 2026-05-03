@@ -19,19 +19,14 @@ function FileList(props: FileListProps) {
     );
 
     return (
-        <ul class="list rounded-md border border-base-300 bg-base-100 ">
+        <ul class="list rounded-md border border-base-300 bg-base-100">
             <For each={sortedContents()}>
                 {(item) => (
                     <li class="list-row">
                         <a href={props.repoUrl + "/" + "tree" + "/" + props.tree + "/" + item.path} class="flex items-center gap-2">
-                            <Switch>
-                                <Match when={item.type === "dir"}>
-                                    <Octicon name="file-directory" size={16} aria-hidden="true" />
-                                </Match>
-                                <Match when={item.type === "file"}>
-                                    <Octicon name="file" size={16} aria-hidden="true" />
-                                </Match>
-                            </Switch>
+                            <Octicon name={item.type === "dir" ? "file-directory-fill" : "file"} size={16} aria-hidden="true"
+                                class="stroke-neutral-content fill-neutral-content"
+                            />
                             {item.name}
                         </a>
                     </li>

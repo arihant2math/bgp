@@ -6,6 +6,7 @@ import { For, Match, Show, Switch } from "solid-js";
 import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
 import { approximateNumber as approx } from "approximate-number";
 import Octicon from "../../components/Octicon.tsx";
+import Avatar from "../../components/Avatar.tsx";
 import {repoHref} from "../../lib/hrefGen.ts";
 import { decodeBase64Content } from "../../lib/content.ts";
 
@@ -51,11 +52,10 @@ function Repository(props: RepositoryProps) {
                     <>
                         <div class="flex min-h-12 flex-row items-center gap-2">
                             <h1 class="text-xl flex flex-row items-center gap-2">
-                                <Octicon
-                                    name={metadataQuery.data.fork ? "repo-forked" : "repo"}
+                                <Avatar
+                                    href={metadataQuery.data.owner.avatar_url}
                                     size={24}
-                                    class="shrink-0 opacity-80"
-                                    aria-hidden="true"
+                                    alt={`${metadataQuery.data.owner.login}'s avatar`}
                                 />
                                 {metadataQuery.data.name}</h1>
                             <div class="badge badge-neutral badge-outline text-xs">{metadataQuery.data.visibility}</div>

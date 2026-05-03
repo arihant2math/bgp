@@ -14,6 +14,8 @@ type OcticonProps = Omit<
     width?: number;
     height?: number;
     label?: string;
+    stroke?: string;
+    fill?: string;
 };
 
 const DEFAULT_HEIGHT = 16;
@@ -39,6 +41,8 @@ const Octicon: Component<OcticonProps> = (props) => {
         "aria-label",
         "aria-hidden",
         "role",
+        "stroke",
+        "fill"
     ]);
 
     const icon = () => octicons[local.name];
@@ -56,8 +60,8 @@ const Octicon: Component<OcticonProps> = (props) => {
     return (
         <svg
             {...svgProps}
-            stroke="currentColor"
-            fill="currentColor"
+            stroke={local.stroke ?? "currentColor"}
+            fill={local.fill ?? "currentColor"}
             version="1.1"
             width={width()}
             height={requestedHeight()}
