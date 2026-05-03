@@ -1,10 +1,11 @@
 import {useQuery} from "@tanstack/solid-query";
 import {getOctokit, parseRestOctokitResponse} from "../../lib/octokit.ts";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";
-import {For, Match, Switch} from "solid-js";
+import {For, Match, Show, Switch} from "solid-js";
 import FileList from "../../components/FileList.tsx";
 import FileRenderer from "../../components/FileRenderer.tsx";
 import {repoHref} from "../../lib/hrefGen.ts";
+import { decodeBase64Content } from "../../lib/content.ts";
 
 export type RepositoryItemProps = {
     profile: string;
@@ -12,13 +13,6 @@ export type RepositoryItemProps = {
     tree: string;
     path: string[];
 };
-
-function decodeBase64Content(content: string) {
-    const binary = atob(content.replace(/\s/g, ""));
-    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-
-    return new TextDecoder().decode(bytes);
-}
 
 function RepositoryItem(props: RepositoryItemProps) {
     // TODO: Standardize contents queries
@@ -29,6 +23,16 @@ function RepositoryItem(props: RepositoryItemProps) {
             getOctokit()
                 .rest.repos.getContent({ owner: props.profile, repo: props.repo, path: props.path.join("/"), ref: props.tree })
                 .then((res) => parseRestOctokitResponse(res)),
+    }));
+
+    const readmeQuery = useQuery(() => ({
+        queryKey: ["readme", props.profile, props.repo, props.tree, props.path],
+        queryFn: () =>
+            getOctokit()
+                .rest.repos.getReadmeInDirectory({ owner: props.profile, repo: props.repo, dir: props.path.join("/"), ref: props.tree })
+                .then((res) => parseRestOctokitResponse(res)),
+        enabled: contentsQuery.isSuccess && Array.isArray(contentsQuery.data),
+        retry: false,
     }));
 
     return (
@@ -60,7 +64,17 @@ function RepositoryItem(props: RepositoryItemProps) {
                 <Match when={contentsQuery.isSuccess}>
                     <Switch>
                         <Match when={Array.isArray(contentsQuery.data)}>
-                            <FileList contents={contentsQuery.data} tree={props.tree} repoUrl={repoHref(props.profile, props.repo)}/>
+                            <>
+                                <FileList contents={contentsQuery.data} tree={props.tree} repoUrl={repoHref(props.profile, props.repo)}/>
+                                <Show when={readmeQuery.isSuccess}>
+                                    <FileRenderer
+                                        content={decodeBase64Content(readmeQuery.data.content)}
+                                        path={readmeQuery.data.path}
+                                        markdownContext={`${props.profile}/${props.repo}`}
+                                        class="mt-4"
+                                    />
+                                </Show>
+                            </>
                         </Match>
                         <Match when={contentsQuery.data.type === "file"}>
                             <FileRenderer

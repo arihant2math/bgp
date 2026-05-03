@@ -1,4 +1,5 @@
 import FileList from "../../components/FileList.tsx";
+import FileRenderer from "../../components/FileRenderer.tsx";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch } from "solid-js";
@@ -6,6 +7,7 @@ import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
 import { approximateNumber as approx } from "approximate-number";
 import Octicon from "../../components/Octicon.tsx";
 import {repoHref} from "../../lib/hrefGen.ts";
+import { decodeBase64Content } from "../../lib/content.ts";
 
 export type RepositoryProps = {
     profile: string;
@@ -24,11 +26,20 @@ function Repository(props: RepositoryProps) {
 
     // TODO: Standardize contents queries
     const contentsQuery = useQuery(() => ({
-        queryKey: ["contents", props.profile, props.repo],
+        queryKey: ["contents", props.profile, props.repo, props.tree],
         queryFn: () =>
             getOctokit()
-                .rest.repos.getContent({ owner: props.profile, repo: props.repo, path: "" })
+                .rest.repos.getContent({ owner: props.profile, repo: props.repo, path: "", ref: props.tree ?? undefined })
                 .then((res) => parseRestOctokitResponse(res)),
+    }));
+
+    const readmeQuery = useQuery(() => ({
+        queryKey: ["readme", props.profile, props.repo, props.tree],
+        queryFn: () =>
+            getOctokit()
+                .rest.repos.getReadme({ owner: props.profile, repo: props.repo, ref: props.tree ?? undefined })
+                .then((res) => parseRestOctokitResponse(res)),
+        retry: false,
     }));
 
     return (
@@ -57,14 +68,22 @@ function Repository(props: RepositoryProps) {
                         <div class="divider my-2"></div>
                         <div class="flex flex-row">
                             <div class="flex-3">
-                                <div>{metadataQuery.data.default_branch}</div>
+                                <div>{props.tree ?? metadataQuery.data.default_branch}</div>
                                 <Switch>
                                     <Match when={contentsQuery.isPending}>Loading ...</Match>
                                     <Match when={contentsQuery.isError}>Error</Match>
                                     <Match when={contentsQuery.isSuccess}>
-                                        <FileList contents={contentsQuery.data} tree={metadataQuery.data.default_branch} repoUrl={repoHref(props.profile, props.repo)}/>
+                                        <FileList contents={contentsQuery.data} tree={props.tree ?? metadataQuery.data.default_branch} repoUrl={repoHref(props.profile, props.repo)}/>
                                     </Match>
                                 </Switch>
+                                <Show when={readmeQuery.isSuccess}>
+                                    <FileRenderer
+                                        content={decodeBase64Content(readmeQuery.data.content)}
+                                        path={readmeQuery.data.path}
+                                        markdownContext={`${props.profile}/${props.repo}`}
+                                        class="mt-4"
+                                    />
+                                </Show>
                             </div>
                             <div class="flex-1 flex flex-col gap-4">
                                 <div>
