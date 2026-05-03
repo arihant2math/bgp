@@ -13,20 +13,20 @@
         "@primer/octicons": "^19.25.0",
         "@primer/solid": "github:arihant2math/primer-solid",
         "@solidjs/router": "^0.16.1",
-        "@tailwindcss/vite": "^4.1.0",
-        "@tanstack/solid-query": "^5.100.8",
+        "@tailwindcss/vite": "^4.2.4",
+        "@tanstack/solid-query": "^5.100.9",
         "approximate-number": "^3.0.1",
         "octokit": "^5.0.5",
-        "solid-js": "^1.9.0",
-        "tailwindcss": "^4.1.0",
+        "solid-js": "^1.9.12",
+        "tailwindcss": "^4.2.4",
         "timeago.js": "^4.0.2"
     },
     "devDependencies": {
         "daisyui": "^5.5.19",
         "prettier": "^3.8.3",
         "shiki": "^4.0.2",
-        "typescript": "~5.9.0",
-        "vite": "^7.1.0",
-        "vite-plugin-solid": "^2.11.0"
+        "typescript": "~5.9.3",
+        "vite": "^7.3.2",
+        "vite-plugin-solid": "^2.11.12"
     }
 }
