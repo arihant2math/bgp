@@ -24,13 +24,7 @@ function Repository(props: RepositoryProps) {
         queryFn: () =>
             getOctokit()
                 .rest.repos.getContent({ owner: props.profile, repo: props.repo, path: "" })
-                .then((res) => {
-                    let data = parseRestOctokitResponse(res);
-                    data.sort((a, b) => {
-                        b.type.localeCompare(a.type)
-                    });
-                    return data;
-                }),
+                .then((res) => parseRestOctokitResponse(res)),
     }));
 
     return (
