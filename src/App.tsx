@@ -28,7 +28,7 @@ const requireAuth = (
 function App() {
     return (
         <div>
-            <MainNavbar link="Better Github Project" href="/" />
+            <MainNavbar breadcrumbs={[]} />
             <Router>
             <Route
                 path="/"
