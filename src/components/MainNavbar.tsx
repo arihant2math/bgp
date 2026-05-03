@@ -1,5 +1,4 @@
 import type { Component } from "solid-js";
-import type {OrganizationTab} from "./OrganizationNavbar.tsx";
 
 type MainNavbarProps = {
     link: string;
