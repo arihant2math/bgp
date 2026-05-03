@@ -29,6 +29,8 @@ function Login() {
                     autocomplete="off"
                 />
                 <button class="bg-blue-500 text-white rounded-md w-fit p-1" type="submit">Login</button>
+                <p>Create a personal auth token
+                    (<a class="text-blue-500 hover-text-blue-600" href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token">Docs</a>)</p>
             </form>
         </main>
     );
