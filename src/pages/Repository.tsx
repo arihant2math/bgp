@@ -88,18 +88,18 @@ function Repository(props: RepositoryProps) {
                                 <div>
                                     <b>About</b>
                                     <p>{metadataQuery.data.description}</p>
-                                    <div class="flex flex-wrap items-start gap-2">
-                                        <For each={metadataQuery.data.topics}>
-                                            {(item, index) =>
-                                                <div class="badge badge-info badge-outline w-fit text-xs">{item}</div>
-                                            }
-                                        </For>
-                                    </div>
                                 </div>
 
                                 <Show when={metadataQuery.data.homepage !== null}>
                                     <div class="flex items-center flex-row gap-2"><Octicon name="link" size={16} aria-hidden="true" /><a href={metadataQuery.data.homepage}>{metadataQuery.data.homepage}</a></div>
                                 </Show>
+                                <div class="flex flex-wrap items-start gap-2">
+                                    <For each={metadataQuery.data.topics}>
+                                        {(item, index) =>
+                                            <div class="badge badge-info badge-outline w-fit text-xs">{item}</div>
+                                        }
+                                    </For>
+                                </div>
                                 <Show when={metadataQuery.data.license !== null}>
                                     <div class="flex items-center flex-row gap-2"><Octicon name="law" size={16} aria-hidden="true" /> <p class="text-sm">{metadataQuery.data.license.name}</p></div>
                                 </Show>
