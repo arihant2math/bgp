@@ -21,7 +21,7 @@ const OrganizationNavbar: Component<OrganizationNavbarProps> = (props) => {
                     <Octicon name="book" size={16} aria-hidden="true" />
                     Overview
                 </a>
-                <a href={profileHref(props.profile), "repositories"} class={tabClass(props, "repositories")}>
+                <a href="#" class={tabClass(props, "repositories")}>
                     <Octicon name="repo" size={16} aria-hidden="true" />
                     Repositories
                 </a>
