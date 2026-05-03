@@ -11,6 +11,7 @@ import Repository from "./pages/repo/Repository.tsx";
 import Commits from "./pages/repo/Commits.tsx";
 import RepositoryItem from "./pages/repo/RepositoryItem.tsx";
 import MainNavbar from "./components/MainNavbar.tsx";
+import { appBasePath } from "./lib/baseUrl.ts";
 
 const EmptyPage = () => <main></main>;
 
@@ -35,7 +36,7 @@ const requireAuth = (
 
 function App() {
     return (
-        <Router root={AppLayout}>
+        <Router base={appBasePath || undefined} root={AppLayout}>
             <Route
                 path="/"
                 component={requireAuth(() => (

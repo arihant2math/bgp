@@ -1,5 +1,6 @@
 import { createMemo, type Component, For, Show } from "solid-js";
 import { useLocation } from "@solidjs/router";
+import { appHref, stripAppBase } from "../lib/baseUrl.ts";
 import { profileHref, repoHref } from "../lib/hrefGen.ts";
 import Octicon from "./Octicon.tsx";
 
@@ -29,7 +30,7 @@ const MainNavbar: Component<MainNavbarProps> = (props) => {
             return props.breadcrumbs;
         }
 
-        const [profileSegment, repoSegment] = location.pathname
+        const [profileSegment, repoSegment] = stripAppBase(location.pathname)
             .split("/")
             .filter(Boolean);
 
@@ -53,7 +54,7 @@ const MainNavbar: Component<MainNavbarProps> = (props) => {
     return (
         <nav class="navbar bg-base-100 shadow-sm">
             <div class="flex-1 flex items-center gap-2">
-                <a href="/">
+                <a href={appHref("/")}>
                     <Octicon name="mark-github" size={32} aria-hidden="true" />
                 </a>
                 <div>

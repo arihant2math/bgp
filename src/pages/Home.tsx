@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/solid-query";
 import { getOctokit, parseRestOctokitResponse } from "../lib/octokit.ts";
 import { Match, Switch } from "solid-js";
+import { profileHref, repoHref } from "../lib/hrefGen.ts";
 
 function Home() {
     const query = useQuery(() => ({
@@ -21,12 +22,12 @@ function Home() {
                         <h1 class="text-2xl">Hi {query.data.name}!</h1>
                         <span>
                             Your Profile:{" "}
-                            <a href={"/" + query.data.login}>
+                            <a href={profileHref(query.data.login)}>
                                 {query.data.login}
                             </a>
                         </span>
                         <span>
-                            Demo: <a href="/servo/servo">Servo</a>
+                            Demo: <a href={repoHref("servo", "servo")}>Servo</a>
                         </span>
                     </div>
                 </Match>
