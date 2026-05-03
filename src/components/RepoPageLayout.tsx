@@ -17,7 +17,9 @@ function RepoPageLayout(props: RepoPageLayoutProps) {
                 repo={props.repo}
                 active={props.active}
             />
-            <div class="flex flex-col mx-8">{props.children}</div>
+            <div class="max-w-6xl mx-auto mt-8">
+                {props.children}
+            </div>
         </main>
     );
 }

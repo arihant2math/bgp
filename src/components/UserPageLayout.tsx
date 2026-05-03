@@ -14,7 +14,7 @@ function UserPageLayout(props: UserPageLayoutProps) {
     return (
         <main>
             <UserNavbar profile={props.profile} active={props.active} />
-            <div class="flex gap-8 mx-8 mt-8">
+            <div class="flex gap-8 max-w-6xl mx-auto mt-8">
                 <aside class="w-72 shrink-0">
                     <Avatar
                         href={props.profileData.data.avatar_url}
