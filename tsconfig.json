@@ -7,6 +7,10 @@
         "types": ["vite/client"],
         "skipLibCheck": true,
         "moduleResolution": "bundler",
+        "baseUrl": ".",
+        "paths": {
+            "@primer/solid": ["./src/vendor/primer-solid.ts"]
+        },
         "allowImportingTsExtensions": true,
         "verbatimModuleSyntax": true,
         "moduleDetection": "force",

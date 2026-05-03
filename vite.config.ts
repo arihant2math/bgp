@@ -1,3 +1,4 @@
+import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
 import tailwindcss from "@tailwindcss/vite";
@@ -12,5 +13,15 @@ const base =
 
 export default defineConfig({
     base,
+    resolve: {
+        alias: {
+            "@primer/solid": fileURLToPath(
+                new URL("./src/vendor/primer-solid.ts", import.meta.url),
+            ),
+        },
+    },
+    optimizeDeps: {
+        exclude: ["@primer/solid"],
+    },
     plugins: [solid(), tailwindcss()],
 });

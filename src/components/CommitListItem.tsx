@@ -1,5 +1,5 @@
 import { createMemo, createSignal, For, Show } from "solid-js";
-import { Button, Link, Spinner } from "../vendor/primer-solid";
+import { Button, Link, Spinner } from "@primer/solid";
 import { format } from "timeago.js";
 import type { CommitAuthor, CommitSummary } from "../lib/githubCommits.ts";
 import Avatar from "./Avatar.tsx";

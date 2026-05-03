@@ -1,5 +1,5 @@
 import { type JSX, Show } from "solid-js";
-import { Button } from "../vendor/primer-solid";
+import { Button } from "@primer/solid";
 import Avatar from "./Avatar.tsx";
 import UserNavbar from "./UserNavbar.tsx";
 import type { UserTab } from "./UserNavbar.tsx";

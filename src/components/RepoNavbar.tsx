@@ -1,5 +1,5 @@
 import type { Component } from "solid-js";
-import { Box, Link } from "../vendor/primer-solid";
+import { Box, Link } from "@primer/solid";
 import Octicon from "./Octicon.tsx";
 import { repoHref } from "../lib/hrefGen.ts";
 

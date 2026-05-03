@@ -1,6 +1,6 @@
 import type { Component } from "solid-js";
 import { Show } from "solid-js";
-import { Card, Label, Link } from "../vendor/primer-solid";
+import { Card, Label, Link } from "@primer/solid";
 import approx from "approximate-number";
 import Octicon from "./Octicon.tsx";
 import { repoHref } from "../lib/hrefGen.ts";

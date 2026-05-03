@@ -1,7 +1,7 @@
 import { useSearchParams } from "@solidjs/router";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo } from "solid-js";
-import { Button, Label, Link, Token } from "../../vendor/primer-solid";
+import { Button, Label, Link, Token } from "@primer/solid";
 import Avatar from "../../components/Avatar.tsx";
 import Octicon from "../../components/Octicon.tsx";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";

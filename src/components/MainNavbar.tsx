@@ -1,6 +1,6 @@
 import { createMemo, type Component, For, Show } from "solid-js";
 import { useLocation } from "@solidjs/router";
-import { Box, Breadcrumbs, Label, Link, TextInput } from "../vendor/primer-solid";
+import { Box, Breadcrumbs, Label, Link, TextInput } from "@primer/solid";
 import { appHref, stripAppBase } from "../lib/baseUrl.ts";
 import { profileHref, repoHref } from "../lib/hrefGen.ts";
 import { repoNavbarState } from "../lib/navbarState.ts";

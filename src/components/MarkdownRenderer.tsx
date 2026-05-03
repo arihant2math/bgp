@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/solid-query";
-import { Spinner } from "../vendor/primer-solid";
+import { Spinner } from "@primer/solid";
 import { Match, Switch } from "solid-js";
 import { getOctokit } from "../lib/octokit.ts";
 import { highlightMarkdownHtml } from "../lib/shiki.ts";

@@ -13,7 +13,7 @@ import {
     Spinner,
     TextInput,
     Token,
-} from "../vendor/primer-solid";
+} from "@primer/solid";
 import { format } from "timeago.js";
 import Octicon from "./Octicon.tsx";
 import RepoPageLayout from "./RepoPageLayout.tsx";

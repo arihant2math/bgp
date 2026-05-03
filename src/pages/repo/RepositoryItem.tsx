@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/solid-query";
 import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";
-import { Breadcrumbs } from "../../vendor/primer-solid";
+import { Breadcrumbs } from "@primer/solid";
 import { For, Match, Show, Switch } from "solid-js";
 import FileList from "../../components/FileList.tsx";
 import FileRenderer from "../../components/FileRenderer.tsx";
