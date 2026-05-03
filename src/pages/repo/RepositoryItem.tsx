@@ -37,6 +37,7 @@ function RepositoryItem(props: RepositoryItemProps) {
 
     return (
         <RepoPageLayout profile={props.profile} repo={props.repo} active="code">
+            {/* TODO: use "/" instead of breadcrumbs */}
             <div class="breadcrumbs text-sm">
                 <ul>
                     <li><a href={repoHref(props.profile, props.repo) + "/tree/" + props.tree}>{props.repo}</a></li>
