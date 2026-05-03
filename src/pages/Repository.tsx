@@ -9,6 +9,7 @@ import Octicon from "../components/Octicon.tsx";
 export type RepositoryProps = {
     profile: string;
     repo: string;
+    tree?: string | null;
 };
 
 function Repository(props: RepositoryProps) {
@@ -16,7 +17,7 @@ function Repository(props: RepositoryProps) {
         queryKey: ["repoMetadata", props.profile, props.repo],
         queryFn: () =>
             getOctokit()
-                .rest.repos.get({ owner: props.profile, repo: props.repo })
+                .rest.repos.get({ owner: props.profile, repo: props.repo, ref: props.tree })
                 .then((res) => parseRestOctokitResponse(res)),
     }));
 

@@ -52,6 +52,17 @@ function App() {
                     <Repository
                         profile={props.params.profile ?? ""}
                         repo={props.params.repo ?? ""}
+                        tree={null}
+                    />
+                ))}
+            />
+            <Route
+                path="/:profile/:repo/tree/:tree"
+                component={requireAuth((props) => (
+                    <Repository
+                        profile={props.params.profile ?? ""}
+                        repo={props.params.repo ?? ""}
+                        tree={props.params.tree ?? ""}
                     />
                 ))}
             />
