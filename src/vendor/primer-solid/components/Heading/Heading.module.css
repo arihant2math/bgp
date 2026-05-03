@@ -1,0 +1,25 @@
+.Heading {
+  margin: 0;
+  color: var(--fgColor-default);
+  font-weight: 600;
+}
+
+.HeadingLarge {
+  font-size: var(--text-title-size-large);
+  line-height: var(--text-title-lineHeight-large);
+}
+
+.HeadingMedium {
+  font-size: var(--text-title-size-medium);
+  line-height: var(--text-title-lineHeight-medium);
+}
+
+.HeadingSmall {
+  font-size: var(--text-title-size-small);
+  line-height: var(--text-title-lineHeight-small);
+}
+
+.HeadingSubhead {
+  font-size: var(--text-subtitle-size);
+  line-height: var(--text-subtitle-lineHeight);
+}

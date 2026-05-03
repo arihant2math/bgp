@@ -1,6 +1,6 @@
-import { createResource, Show } from "solid-js";
-import { bundledLanguagesInfo, createHighlighter } from "shiki";
-import type { BundledLanguage, BundledTheme } from "shiki";
+import { createMemo, createResource, For, Show } from "solid-js";
+import type { BundledTheme } from "shiki";
+import { highlightCode } from "../lib/shiki.ts";
 
 export type CodeRendererProps = {
     code: string;
@@ -9,108 +9,53 @@ export type CodeRendererProps = {
     theme?: BundledTheme;
     class?: string;
 };
+function withLineNumbers(html: string) {
+    if (typeof DOMParser === "undefined") return html;
 
-const defaultTheme: BundledTheme = "github-light";
-const defaultDarkTheme: BundledTheme = "github-dark";
-let highlighterPromise: ReturnType<typeof createHighlighter> | undefined;
+    const document = new DOMParser().parseFromString(html, "text/html");
+    const code = document.querySelector("pre > code");
 
-function getHighlighter() {
-    highlighterPromise ??= createHighlighter({
-        themes: [defaultTheme, defaultDarkTheme],
-        langs: ["text"],
-    });
+    if (!code) return html;
 
-    return highlighterPromise;
-}
+    const lines = Array.from(code.querySelectorAll(":scope > span.line"));
+    if (lines.length === 0) return html;
 
-const filenameLanguages: Record<string, string> = {
-    dockerfile: "dockerfile",
-    makefile: "makefile",
-    "package.json": "json",
-    "tsconfig.json": "jsonc",
-    "vite.config.ts": "ts",
-    "vite.config.js": "js",
-};
+    const fragment = document.createDocumentFragment();
 
-const extensionLanguages: Record<string, string> = {
-    cjs: "js",
-    h: "c",
-    hpp: "cpp",
-    htm: "html",
-    js: "javascript",
-    jsx: "jsx",
-    mjs: "js",
-    py: "python",
-    rb: "ruby",
-    rs: "rust",
-    ts: "typescript",
-    tsx: "tsx",
-    yml: "yaml",
-};
+    for (const [index, line] of lines.entries()) {
+        const row = document.createElement("span");
+        row.className = "code-line";
 
-function isBundledLanguage(language: string): language is BundledLanguage {
-    return bundledLanguagesInfo.some(
-        (info) => info.id === language || info.aliases?.includes(language),
-    );
-}
+        const gutter = document.createElement("span");
+        gutter.className = "code-line-number";
+        gutter.textContent = String(index + 1);
 
-function inferLanguage(path?: string) {
-    if (!path) return "text";
+        const content = document.createElement("span");
+        content.className = "code-line-content";
+        while (line.firstChild) {
+            content.append(line.firstChild);
+        }
 
-    const filename = path.split("/").pop()?.toLowerCase() ?? "";
-    const extension = filename.includes(".")
-        ? filename.split(".").pop()
-        : undefined;
+        if (content.childNodes.length === 0) {
+            content.textContent = " ";
+        }
 
-    return (
-        filenameLanguages[filename] ??
-        (extension ? (extensionLanguages[extension] ?? extension) : "text")
-    );
-}
-
-async function renderCode(
-    code: string,
-    language?: string,
-    path?: string,
-    theme?: BundledTheme,
-) {
-    const requestedLanguage = (language ?? inferLanguage(path)).toLowerCase();
-    const shikiLanguage = isBundledLanguage(requestedLanguage)
-        ? requestedLanguage
-        : "text";
-    const highlighter = await getHighlighter();
-
-    if (shikiLanguage !== "text") {
-        await highlighter.loadLanguage(shikiLanguage);
+        row.append(gutter, content);
+        fragment.append(row);
     }
 
-    if (theme && theme !== defaultTheme && theme !== defaultDarkTheme) {
-        await highlighter.loadTheme(theme);
-    }
-
-    return highlighter.codeToHtml(
-        code,
-        theme
-            ? {
-                  lang: shikiLanguage,
-                  theme,
-              }
-            : {
-                  lang: shikiLanguage,
-                  themes: {
-                      light: defaultTheme,
-                      dark: defaultDarkTheme,
-                  },
-                  defaultColor: "light",
-              },
-    );
+    code.replaceChildren(fragment);
+    return document.body.innerHTML;
 }
 
 function CodeRenderer(props: CodeRendererProps) {
+    const fallbackLines = createMemo(() => props.code.split("\n"));
     const [html] = createResource(
         () => [props.code, props.language, props.path, props.theme] as const,
-        ([code, language, path, theme]) =>
-            renderCode(code, language, path, theme),
+        async ([code, language, path, theme]) =>
+            withLineNumbers(
+                await highlightCode(code, language, path, theme),
+            ),
     );
 
     return (
@@ -121,7 +66,20 @@ function CodeRenderer(props: CodeRendererProps) {
                 when={html()}
                 fallback={
                     <pre class="m-0 overflow-x-auto p-4 text-sm leading-6">
-                        <code>{props.code}</code>
+                        <code>
+                            <For each={fallbackLines()}>
+                                {(line, index) => (
+                                    <span class="code-line">
+                                        <span class="code-line-number">
+                                            {index() + 1}
+                                        </span>
+                                        <span class="code-line-content">
+                                            {line.length > 0 ? line : " "}
+                                        </span>
+                                    </span>
+                                )}
+                            </For>
+                        </code>
                     </pre>
                 }
             >

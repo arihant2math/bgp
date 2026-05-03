@@ -1,6 +1,7 @@
 import { useSearchParams } from "@solidjs/router";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo } from "solid-js";
+import { Button, Label, Link, Token } from "../../vendor/primer-solid";
 import Avatar from "../../components/Avatar.tsx";
 import Octicon from "../../components/Octicon.tsx";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";
@@ -44,7 +45,7 @@ function CommitRow(props: { commit: CommitSummary }) {
     const primaryAuthor = () => props.commit.authors[0];
 
     return (
-        <li class="list-row items-start">
+        <li class="flex items-start gap-3 border-b border-base-300 px-4 py-4 last:border-b-0">
             <Show
                 when={primaryAuthor()?.avatarUrl}
                 fallback={
@@ -68,14 +69,13 @@ function CommitRow(props: { commit: CommitSummary }) {
                         fallback={props.commit.message}
                     >
                         {(commitUrl) => (
-                            <a
+                            <Link
                                 href={commitUrl()}
                                 target="_blank"
                                 rel="noreferrer"
-                                class="link link-hover"
                             >
                                 {props.commit.message}
-                            </a>
+                            </Link>
                         )}
                     </Show>
                 </div>
@@ -96,20 +96,23 @@ function CommitRow(props: { commit: CommitSummary }) {
             <Show
                 when={props.commit.commitUrl}
                 fallback={
-                    <span class="btn btn-sm btn-ghost font-mono">
+                    <Button type="button" variant="invisible" size="small" class="font-mono">
                         {props.commit.abbreviatedOid}
-                    </span>
+                    </Button>
                 }
             >
                 {(commitUrl) => (
-                    <a
+                    <Button
+                        as="a"
                         href={commitUrl()}
                         target="_blank"
                         rel="noreferrer"
-                        class="btn btn-sm btn-ghost font-mono"
+                        variant="invisible"
+                        size="small"
+                        class="font-mono"
                     >
                         {props.commit.abbreviatedOid}
-                    </a>
+                    </Button>
                 )}
             </Show>
         </li>
@@ -144,10 +147,10 @@ function Commits(props: CommitsProps) {
         <RepoPageLayout profile={props.profile} repo={props.repo} active="code">
             <div class="mb-4 flex flex-wrap items-center gap-3">
                 <h1 class="text-xl font-semibold">Commit history</h1>
-                <div class="badge badge-neutral badge-outline">{props.tree}</div>
+                <Label>{props.tree}</Label>
                 <Show when={path()}>
                     {(currentPath) => (
-                        <div class="badge badge-ghost">/{currentPath()}</div>
+                        <Token text={`/${currentPath()}`} />
                     )}
                 </Show>
             </div>
@@ -179,40 +182,26 @@ function Commits(props: CommitsProps) {
                                 <Show
                                     when={history().hasPrevious}
                                     fallback={
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            disabled
-                                        >
+                                        <Button type="button" disabled>
                                             Previous
-                                        </button>
+                                        </Button>
                                     }
                                 >
-                                    <a
-                                        href={commitPageHref(props, page() - 1)}
-                                        class="btn"
-                                    >
+                                    <Button as="a" href={commitPageHref(props, page() - 1)}>
                                         Previous
-                                    </a>
+                                    </Button>
                                 </Show>
                                 <Show
                                     when={history().hasNext}
                                     fallback={
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            disabled
-                                        >
+                                        <Button type="button" disabled>
                                             Next
-                                        </button>
+                                        </Button>
                                     }
                                 >
-                                    <a
-                                        href={commitPageHref(props, page() + 1)}
-                                        class="btn"
-                                    >
+                                    <Button as="a" href={commitPageHref(props, page() + 1)}>
                                         Next
-                                    </a>
+                                    </Button>
                                 </Show>
                             </div>
                         </>

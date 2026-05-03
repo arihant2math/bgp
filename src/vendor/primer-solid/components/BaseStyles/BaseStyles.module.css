@@ -1,0 +1,28 @@
+.BaseStyles {
+  min-width: 320px;
+  color: var(--fgColor-default);
+  font-family: var(--primer-solid-font-stack);
+  font-size: var(--text-body-size-medium);
+  line-height: var(--text-body-lineHeight-medium);
+  word-wrap: break-word;
+  background-color: var(--bgColor-default);
+}
+
+.BaseStyles b,
+.BaseStyles strong {
+  font-weight: 600;
+}
+
+.BaseStyles hr {
+  height: 0;
+  margin: var(--base-size-24) 0;
+  border: 0;
+  border-top: 1px solid var(--borderColor-muted);
+}
+
+.BaseStyles code,
+.BaseStyles kbd,
+.BaseStyles pre,
+.BaseStyles samp {
+  font-family: var(--primer-solid-mono-font-stack);
+}

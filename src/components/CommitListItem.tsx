@@ -1,4 +1,5 @@
 import { createMemo, createSignal, For, Show } from "solid-js";
+import { Button, Link, Spinner } from "../vendor/primer-solid";
 import { format } from "timeago.js";
 import type { CommitAuthor, CommitSummary } from "../lib/githubCommits.ts";
 import Avatar from "./Avatar.tsx";
@@ -35,21 +36,20 @@ function authorsLabel(authors: CommitAuthor[], totalCount: number) {
 
 function HistoryButton(props: { label?: string; href?: string }) {
     const label = () => props.label ?? "History";
-    const className = "btn btn-sm btn-ghost shrink-0";
 
     return (
         <Show
             when={props.href}
             fallback={
-                <button type="button" class={className}>
+                <Button type="button" variant="invisible" size="small">
                     {label()}
-                </button>
+                </Button>
             }
         >
             {(href) => (
-                <a href={href()} class={className}>
+                <Button as="a" href={href()} variant="invisible" size="small">
                     {label()}
-                </a>
+                </Button>
             )}
         </Show>
     );
@@ -137,9 +137,10 @@ function CommitBody(props: CommitListItemProps & { commit: CommitSummary }) {
                 {shownMessage()}
             </span>
             <Show when={needsExpansion()}>
-                <button
+                <Button
                     type="button"
-                    class="btn btn-ghost btn-xs shrink-0"
+                    variant="invisible"
+                    size="small"
                     aria-label={
                         expanded()
                             ? "Collapse commit message"
@@ -152,7 +153,7 @@ function CommitBody(props: CommitListItemProps & { commit: CommitSummary }) {
                         size={14}
                         aria-hidden="true"
                     />
-                </button>
+                </Button>
             </Show>
             <div class="ml-auto flex shrink-0 items-center gap-2">
                 <div class="flex items-center gap-2 text-xs opacity-70">
@@ -165,14 +166,14 @@ function CommitBody(props: CommitListItemProps & { commit: CommitSummary }) {
                         }
                     >
                         {(commitUrl) => (
-                            <a
+                            <Link
                                 href={commitUrl()}
-                                class="font-mono link link-hover"
+                                class="font-mono"
                                 target="_blank"
                                 rel="noreferrer"
                             >
                                 {props.commit.abbreviatedOid}
-                            </a>
+                            </Link>
                         )}
                     </Show>
                     <span aria-hidden="true">·</span>
@@ -200,10 +201,7 @@ function CommitListItem(props: CommitListItemProps) {
             when={props.commit !== undefined}
             fallback={
                 <div class="flex w-full items-center gap-2 text-sm">
-                    <span
-                        class="loading loading-spinner loading-xs"
-                        aria-hidden="true"
-                    />
+                    <Spinner size="small" srText={null} />
                     <span class="opacity-70">Loading latest commit…</span>
                     <div class="ml-auto">
                         <HistoryButton

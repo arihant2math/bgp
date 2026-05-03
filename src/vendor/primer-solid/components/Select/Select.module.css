@@ -1,0 +1,36 @@
+.Select {
+  width: 100%;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  margin-left: 1px;
+  font: inherit;
+  color: currentColor;
+  background-color: inherit;
+  border: 0;
+  border-radius: inherit;
+  outline: none;
+  appearance: none;
+
+  &:disabled {
+    background-color: transparent;
+  }
+
+  @media screen and (forced-colors: active) {
+    &:disabled {
+      background-color: -moz-combobox;
+    }
+  }
+}
+
+.TextInputWrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.ArrowIndicator {
+  position: absolute;
+  top: 50%;
+  right: var(--base-size-4);
+  pointer-events: none;
+  transform: translateY(-50%);
+}

@@ -1,0 +1,83 @@
+.Body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  & > * + * {
+    margin-top: var(--base-size-8);
+  }
+}
+
+.GroupFieldset {
+  padding: 0;
+  margin: 0;
+  border: 0;
+
+  &:where([data-validation]) {
+    margin-bottom: var(--base-size-8);
+  }
+}
+
+.GroupLegend {
+  padding: 0;
+
+  &:where([data-legend-visible]) {
+    margin-bottom: var(--base-size-8);
+  }
+}
+
+.GroupLabel {
+  display: block;
+  font-size: var(--text-body-size-medium);
+  font-weight: var(--base-text-weight-semibold);
+
+  &:where([data-label-disabled]) {
+    color: var(--fgColor-muted);
+  }
+}
+
+.GroupLabelContent {
+  display: inline-flex;
+  gap: var(--base-size-8);
+  align-items: center;
+}
+
+.GroupCaption {
+  display: block;
+  font-size: var(--text-body-size-medium);
+  color: var(--fgColor-muted);
+}
+
+.Validation {
+  display: flex;
+  font-size: var(--text-body-size-small);
+  font-weight: var(--base-text-weight-semibold);
+  color: var(--choiceInputGroup-validationColor);
+
+  &:where([data-validation-status='success']) {
+    --choiceInputGroup-validationColor: var(--fgColor-success);
+  }
+
+  &:where([data-validation-status='error']) {
+    --choiceInputGroup-validationColor: var(--fgColor-danger);
+  }
+
+  & :where(a) {
+    color: currentColor;
+    text-decoration: underline;
+  }
+}
+
+.ValidationIcon {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: var(--base-size-16);
+  margin-right: var(--base-size-4);
+}
+
+.ValidationText {
+  line-height: 1.3333333333;
+}

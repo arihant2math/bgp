@@ -1,4 +1,5 @@
 import type { Component } from "solid-js";
+import { Box, Link } from "../vendor/primer-solid";
 import Octicon from "./Octicon.tsx";
 import { repoHref } from "../lib/hrefGen.ts";
 
@@ -10,59 +11,62 @@ type RepoNavbarProps = {
     active: RepoTab;
 };
 
-function tabClass(props: RepoNavbarProps, tab: string) {
-    return `tab ${props.active === tab ? "tab-active" : ""} gap-2`;
+function tabSx(active: boolean) {
+    return {
+        display: "inline-flex",
+        "align-items": "center",
+        gap: "0.5rem",
+        padding: "0.75rem 0",
+        "font-weight": active ? "600" : "500",
+        color: active ? "#0969da" : "var(--fgColor-muted)",
+        "text-decoration": "none",
+        "border-bottom": active
+            ? "2px solid #0969da"
+            : "2px solid transparent",
+    } as const;
 }
 
 const RepoNavbar: Component<RepoNavbarProps> = (props) => {
     return (
-        <nav>
-            <div role="tablist" class="tabs tabs-border">
-                <a
-                    href={repoHref(props.profile, props.repo)}
-                    class={tabClass(props, "code")}
-                >
-                    <Octicon name="code" size={16} aria-hidden="true" />
-                    Code
-                </a>
-                <a
-                    href={repoHref(props.profile, props.repo, "/issues")}
-                    class={tabClass(props, "issues")}
-                >
-                    <Octicon name="issue-opened" size={16} aria-hidden="true" />
-                    Issues
-                </a>
-                <a
-                    href={repoHref(props.profile, props.repo, "/pulls")}
-                    class={tabClass(props, "pulls")}
-                >
-                    <Octicon
-                        name="git-pull-request"
-                        size={16}
-                        aria-hidden="true"
-                    />
-                    Pull Requests
-                </a>
-                <a
-                    href={repoHref(props.profile, props.repo, "/discussions")}
-                    class={tabClass(props, "discussions")}
-                >
-                    <Octicon
-                        name="comment-discussion"
-                        size={16}
-                        aria-hidden="true"
-                    />
-                    Discussions
-                </a>
-                <a
-                    href={repoHref(props.profile, props.repo, "/actions")}
-                    class={tabClass(props, "actions")}
-                >
-                    <Octicon name="play" size={16} aria-hidden="true" />
-                    Actions
-                </a>
-            </div>
-        </nav>
+        <Box
+            as="nav"
+            sx={{
+                display: "flex",
+                gap: "2rem",
+                "border-bottom": "1px solid var(--borderColor-default)",
+                "margin-bottom": "1.5rem",
+            }}
+        >
+            <Link href={repoHref(props.profile, props.repo)} sx={tabSx(props.active === "code")}>
+                <Octicon name="code" size={16} aria-hidden="true" />
+                Code
+            </Link>
+            <Link
+                href={repoHref(props.profile, props.repo, "/issues")}
+                sx={tabSx(props.active === "issues")}
+            >
+                <Octicon name="issue-opened" size={16} aria-hidden="true" />
+                Issues
+            </Link>
+            <Link
+                href={repoHref(props.profile, props.repo, "/pulls")}
+                sx={tabSx(props.active === "pulls")}
+            >
+                <Octicon name="git-pull-request" size={16} aria-hidden="true" />
+                Pull Requests
+            </Link>
+            <Link
+                href={repoHref(props.profile, props.repo, "/discussions")}
+                sx={tabSx(false)}
+            >
+                <Octicon name="comment-discussion" size={16} aria-hidden="true" />
+                Discussions
+            </Link>
+            <Link href={repoHref(props.profile, props.repo, "/actions")} sx={tabSx(false)}>
+                <Octicon name="play" size={16} aria-hidden="true" />
+                Actions
+            </Link>
+        </Box>
     );
 };
 

@@ -1,4 +1,4 @@
-import { Navigate, Route, Router } from "@solidjs/router";
+import { Navigate, Route, Router, useParams } from "@solidjs/router";
 import type { RouteSectionProps } from "@solidjs/router";
 import type { Component, JSX } from "solid-js";
 import Home from "./pages/Home";
@@ -9,7 +9,6 @@ import Profile from "./pages/Profile";
 import Pulls from "./pages/repo/Pulls.tsx";
 import Repository from "./pages/repo/Repository.tsx";
 import Commits from "./pages/repo/Commits.tsx";
-import RepositoryItem from "./pages/repo/RepositoryItem.tsx";
 import MainNavbar from "./components/MainNavbar.tsx";
 import { appBasePath } from "./lib/baseUrl.ts";
 
@@ -34,6 +33,38 @@ const requireAuth = (
     };
 };
 
+function RepoCodeRoute() {
+    const params = useParams();
+    const restParam = () => params.rest;
+    const rest = () =>
+        Array.isArray(restParam()) ? restParam().join("/") : (restParam() ?? "");
+
+    if (rest() === "") {
+        return (
+            <Repository
+                profile={params.profile ?? ""}
+                repo={params.repo ?? ""}
+                tree={null}
+                path={[]}
+            />
+        );
+    }
+
+    const segments = () => rest().split("/").filter(Boolean);
+    if (segments()[0] !== "tree" || !segments()[1]) {
+        return <EmptyPage />;
+    }
+
+    return (
+        <Repository
+            profile={params.profile ?? ""}
+            repo={params.repo ?? ""}
+            tree={segments()[1]}
+            path={segments().slice(2)}
+        />
+    );
+}
+
 function App() {
     return (
         <Router base={appBasePath || undefined} root={AppLayout}>
@@ -54,43 +85,6 @@ function App() {
                 path="/:profile"
                 component={requireAuth((props) => (
                     <Profile profile={props.params.profile ?? ""} />
-                ))}
-            />
-            <Route
-                path="/:profile/:repo"
-                component={requireAuth((props) => (
-                    <Repository
-                        profile={props.params.profile ?? ""}
-                        repo={props.params.repo ?? ""}
-                        tree={null}
-                    />
-                ))}
-            />
-            <Route
-                path="/:profile/:repo/tree/:tree"
-                component={requireAuth((props) => (
-                    <Repository
-                        profile={props.params.profile ?? ""}
-                        repo={props.params.repo ?? ""}
-                        tree={props.params.tree ?? ""}
-                    />
-                ))}
-            />
-            <Route
-                path="/:profile/:repo/tree/:tree/*path"
-                component={requireAuth((props) => (
-                    <RepositoryItem
-                        profile={props.params.profile ?? ""}
-                        repo={props.params.repo ?? ""}
-                        tree={props.params.tree ?? ""}
-                        path={
-                            Array.isArray(props.params.path)
-                                ? props.params.path
-                                : props.params.path
-                                  ? [props.params.path]
-                                  : []
-                        }
-                    />
                 ))}
             />
             <Route
@@ -138,6 +132,10 @@ function App() {
                         repo={props.params.repo ?? ""}
                     />
                 ))}
+            />
+            <Route
+                path="/:profile/:repo/*rest"
+                component={requireAuth(() => <RepoCodeRoute />)}
             />
             <Route
                 path="*"

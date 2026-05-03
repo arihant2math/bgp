@@ -1,0 +1,48 @@
+.Stack {
+  display: flex;
+  min-width: 0;
+}
+
+.StackVertical {
+  flex-direction: column;
+}
+
+.StackHorizontal {
+  flex-direction: row;
+}
+
+.StackWrap {
+  flex-wrap: wrap;
+}
+
+.StackAlignStart {
+  align-items: flex-start;
+}
+
+.StackAlignCenter {
+  align-items: center;
+}
+
+.StackAlignEnd {
+  align-items: flex-end;
+}
+
+.StackAlignStretch {
+  align-items: stretch;
+}
+
+.StackJustifyStart {
+  justify-content: flex-start;
+}
+
+.StackJustifyCenter {
+  justify-content: center;
+}
+
+.StackJustifyEnd {
+  justify-content: flex-end;
+}
+
+.StackJustifyBetween {
+  justify-content: space-between;
+}

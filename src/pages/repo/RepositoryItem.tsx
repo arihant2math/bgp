@@ -1,12 +1,14 @@
 import { useQuery } from "@tanstack/solid-query";
 import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";
+import { Breadcrumbs } from "../../vendor/primer-solid";
 import { For, Match, Show, Switch } from "solid-js";
 import FileList from "../../components/FileList.tsx";
 import FileRenderer from "../../components/FileRenderer.tsx";
 import { repoCommitsHref, repoHref } from "../../lib/hrefGen.ts";
 import { decodeBase64Content } from "../../lib/content.ts";
 import { fetchDirectoryCommitMetadata } from "../../lib/githubCommits.ts";
+import { fetchRepositoryTreeEntries } from "../../lib/githubTree.ts";
 
 export type RepositoryItemProps = {
     profile: string;
@@ -67,53 +69,66 @@ function RepositoryItem(props: RepositoryItemProps) {
         enabled: contentsQuery.isSuccess && Array.isArray(contentsQuery.data),
     }));
 
+    const treeEntriesQuery = useQuery(() => ({
+        queryKey: ["repoTreeEntries", props.profile, props.repo, props.tree, props.path],
+        queryFn: () =>
+            fetchRepositoryTreeEntries({
+                owner: props.profile,
+                repo: props.repo,
+                ref: props.tree,
+                prefix: props.path,
+            }),
+        enabled: contentsQuery.isSuccess && Array.isArray(contentsQuery.data),
+    }));
+
+    const sidebarTreeEntriesQuery = useQuery(() => ({
+        queryKey: ["repoTreeSidebarEntries", props.profile, props.repo, props.tree],
+        queryFn: () =>
+            fetchRepositoryTreeEntries({
+                owner: props.profile,
+                repo: props.repo,
+                ref: props.tree,
+            }),
+        enabled: contentsQuery.isSuccess && !Array.isArray(contentsQuery.data),
+    }));
+
     return (
         <RepoPageLayout profile={props.profile} repo={props.repo} active="code">
-            {/* TODO: use "/" instead of breadcrumbs */}
-            <div class="breadcrumbs text-sm">
-                <ul>
-                    <li>
-                        <a
+            <Breadcrumbs>
+                <Breadcrumbs.Item
+                    href={
+                        repoHref(props.profile, props.repo) +
+                        "/tree/" +
+                        props.tree
+                    }
+                >
+                    {props.repo}
+                </Breadcrumbs.Item>
+                <For each={props.path}>
+                    {(segment, index) => (
+                        <Breadcrumbs.Item
+                            as={index() === props.path.length - 1 ? "span" : "a"}
+                            selected={index() === props.path.length - 1}
                             href={
-                                repoHref(props.profile, props.repo) +
-                                "/tree/" +
-                                props.tree
+                                index() === props.path.length - 1
+                                    ? undefined
+                                    : repoHref(
+                                          props.profile,
+                                          props.repo,
+                                      ) +
+                                      "/tree/" +
+                                      props.tree +
+                                      "/" +
+                                      props.path
+                                          .slice(0, index() + 1)
+                                          .join("/")
                             }
                         >
-                            {props.repo}
-                        </a>
-                    </li>
-                    <For each={props.path}>
-                        {(segment, index) => (
-                            <Switch>
-                                <Match when={index() === props.path.length - 1}>
-                                    <li>{segment}</li>
-                                </Match>
-                                <Match when={index() < props.path.length - 1}>
-                                    <li>
-                                        <a
-                                            href={
-                                                repoHref(
-                                                    props.profile,
-                                                    props.repo,
-                                                ) +
-                                                "/tree/" +
-                                                props.tree +
-                                                "/" +
-                                                props.path
-                                                    .slice(0, index() + 1)
-                                                    .join("/")
-                                            }
-                                        >
-                                            {segment}
-                                        </a>
-                                    </li>
-                                </Match>
-                            </Switch>
-                        )}
-                    </For>
-                </ul>
-            </div>
+                            {segment}
+                        </Breadcrumbs.Item>
+                    )}
+                </For>
+            </Breadcrumbs>
             <Switch>
                 <Match when={contentsQuery.isPending}>Loading ...</Match>
                 <Match when={contentsQuery.isError}>Error</Match>
@@ -123,11 +138,13 @@ function RepositoryItem(props: RepositoryItemProps) {
                             <>
                                 <FileList
                                     contents={contentsQuery.data}
+                                    entries={treeEntriesQuery.data}
                                     tree={props.tree}
                                     repoUrl={repoHref(
                                         props.profile,
                                         props.repo,
                                     )}
+                                    pathPrefix={props.path}
                                     latestCommit={
                                         commitMetadataQuery.isError
                                             ? null
@@ -164,13 +181,32 @@ function RepositoryItem(props: RepositoryItemProps) {
                             </>
                         </Match>
                         <Match when={contentsQuery.data.type === "file"}>
-                            <FileRenderer
-                                content={decodeBase64Content(
-                                    contentsQuery.data.content,
-                                )}
-                                path={contentsQuery.data.path}
-                                markdownContext={`${props.profile}/${props.repo}`}
-                            />
+                            <div class="flex gap-6 items-start">
+                                <aside class="w-80 shrink-0">
+                                    <FileList
+                                        class="sticky top-4"
+                                        containerHeight="70vh"
+                                        contents={[]}
+                                        entries={sidebarTreeEntriesQuery.data}
+                                        tree={props.tree}
+                                        repoUrl={repoHref(
+                                            props.profile,
+                                            props.repo,
+                                        )}
+                                        selectedPath={props.path.join("/")}
+                                        showHeader={false}
+                                    />
+                                </aside>
+                                <div class="min-w-0 flex-1">
+                                    <FileRenderer
+                                        content={decodeBase64Content(
+                                            contentsQuery.data.content,
+                                        )}
+                                        path={contentsQuery.data.path}
+                                        markdownContext={`${props.profile}/${props.repo}`}
+                                    />
+                                </div>
+                            </div>
                         </Match>
                     </Switch>
                 </Match>

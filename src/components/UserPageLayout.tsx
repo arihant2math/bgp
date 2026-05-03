@@ -1,4 +1,5 @@
 import { type JSX, Show } from "solid-js";
+import { Button } from "../vendor/primer-solid";
 import Avatar from "./Avatar.tsx";
 import UserNavbar from "./UserNavbar.tsx";
 import type { UserTab } from "./UserNavbar.tsx";
@@ -26,7 +27,7 @@ function UserPageLayout(props: UserPageLayoutProps) {
                         />
                         <h1 class="text-2xl">{props.profileData.data.name}</h1>
                         <p class="text-lg">{props.profileData.data.login}</p>
-                        <button class="btn w-full">Follow</button>
+                        <Button class="w-full">Follow</Button>
                         <p>{props.profileData.data.bio}</p>
                         <Show when={props.profileData.data.location !== null}>
                             <div class="flex items-center flex-row gap-2">

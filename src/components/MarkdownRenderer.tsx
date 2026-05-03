@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/solid-query";
+import { Spinner } from "../vendor/primer-solid";
 import { Match, Switch } from "solid-js";
 import { getOctokit } from "../lib/octokit.ts";
+import { highlightMarkdownHtml } from "../lib/shiki.ts";
 
 export type MarkdownRendererProps = {
     markdown: string;
@@ -22,7 +24,7 @@ async function renderMarkdown(
         ...(context ? { context } : {}),
     });
 
-    return response.data;
+    return highlightMarkdownHtml(response.data);
 }
 
 function MarkdownRenderer(props: MarkdownRendererProps) {
@@ -38,10 +40,7 @@ function MarkdownRenderer(props: MarkdownRendererProps) {
             <Switch>
                 <Match when={htmlQuery.isPending}>
                     <div class="flex items-center gap-3 p-4 text-sm text-base-content/70">
-                        <span
-                            class="loading loading-spinner loading-sm"
-                            aria-hidden="true"
-                        />
+                        <Spinner size="small" srText={null} />
                         Rendering markdown…
                     </div>
                 </Match>

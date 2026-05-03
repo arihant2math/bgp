@@ -1,0 +1,30 @@
+.Text:where([data-size='small']) {
+  font-size: var(--text-body-size-small);
+  line-height: var(--text-body-lineHeight-small);
+}
+
+.Text:where([data-size='medium']) {
+  font-size: var(--text-body-size-medium);
+  line-height: var(--text-body-lineHeight-medium);
+}
+
+.Text:where([data-size='large']) {
+  font-size: var(--text-body-size-large);
+  line-height: var(--text-body-lineHeight-large);
+}
+
+.Text:where([data-weight='light']) {
+  font-weight: var(--base-text-weight-light);
+}
+
+.Text:where([data-weight='normal']) {
+  font-weight: var(--base-text-weight-normal);
+}
+
+.Text:where([data-weight='medium']) {
+  font-weight: var(--base-text-weight-medium);
+}
+
+.Text:where([data-weight='semibold']) {
+  font-weight: var(--base-text-weight-semibold);
+}
