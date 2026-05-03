@@ -11,11 +11,12 @@ export type CodeRendererProps = {
 };
 
 const defaultTheme: BundledTheme = "github-light";
+const defaultDarkTheme: BundledTheme = "github-dark";
 let highlighterPromise: ReturnType<typeof createHighlighter> | undefined;
 
 function getHighlighter() {
     highlighterPromise ??= createHighlighter({
-        themes: [defaultTheme, "github-dark"],
+        themes: [defaultTheme, defaultDarkTheme],
         langs: ["text"],
     });
 
@@ -71,7 +72,7 @@ async function renderCode(
     code: string,
     language?: string,
     path?: string,
-    theme: BundledTheme = defaultTheme,
+    theme?: BundledTheme,
 ) {
     const requestedLanguage = (language ?? inferLanguage(path)).toLowerCase();
     const shikiLanguage = isBundledLanguage(requestedLanguage)
@@ -83,25 +84,31 @@ async function renderCode(
         await highlighter.loadLanguage(shikiLanguage);
     }
 
-    if (theme !== defaultTheme && theme !== "github-dark") {
+    if (theme && theme !== defaultTheme && theme !== defaultDarkTheme) {
         await highlighter.loadTheme(theme);
     }
 
-    return highlighter.codeToHtml(code, {
-        lang: shikiLanguage,
-        theme,
-    });
+    return highlighter.codeToHtml(
+        code,
+        theme
+            ? {
+                  lang: shikiLanguage,
+                  theme,
+              }
+            : {
+                  lang: shikiLanguage,
+                  themes: {
+                      light: defaultTheme,
+                      dark: defaultDarkTheme,
+                  },
+                  defaultColor: "light",
+              },
+    );
 }
 
 function CodeRenderer(props: CodeRendererProps) {
     const [html] = createResource(
-        () =>
-            [
-                props.code,
-                props.language,
-                props.path,
-                props.theme ?? defaultTheme,
-            ] as const,
+        () => [props.code, props.language, props.path, props.theme] as const,
         ([code, language, path, theme]) =>
             renderCode(code, language, path, theme),
     );
