@@ -2,3 +2,16 @@
 @plugin "daisyui";
 
 @theme {}
+
+.code-renderer pre {
+    margin: 0;
+    padding: 1rem;
+    min-width: max-content;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    tab-size: 4;
+}
+
+.code-renderer code {
+    font-family: "SFMono-Regular", "Cascadia Code", "Liberation Mono", monospace;
+}
