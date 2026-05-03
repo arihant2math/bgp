@@ -63,8 +63,8 @@ const Octicon: Component<OcticonProps> = (props) => {
     return (
         <svg
             {...svgProps}
-            stroke={local.stroke ?? "currentColor"}
-            fill={local.fill ?? "currentColor"}
+            // stroke={local.stroke ?? "currentColor"}
+            // fill={local.fill ?? "currentColor"}
             version="1.1"
             width={width()}
             height={requestedHeight()}

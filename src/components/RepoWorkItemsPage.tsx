@@ -1,14 +1,12 @@
 import { useSearchParams } from "@solidjs/router";
 import { useQuery } from "@tanstack/solid-query";
-import { For, Match, Show, Switch, createMemo } from "solid-js";
+import { For, Match, Show, Switch, createMemo, type JSX } from "solid-js";
 import { format } from "timeago.js";
-import Avatar from "./Avatar.tsx";
 import Octicon from "./Octicon.tsx";
 import RepoPageLayout from "./RepoPageLayout.tsx";
 import {
     SEARCH_RESULT_LIMIT,
     WORK_ITEMS_PER_PAGE,
-    buildWorkItemsSearchQuery,
     defaultWorkItemFilters,
     fetchWorkItems,
     normalizeWorkItemFilters,
@@ -40,12 +38,6 @@ type FilterChip = {
     label: string;
     href: string;
 };
-
-const STATE_OPTIONS: Array<{ value: WorkItemState; label: string }> = [
-    { value: "open", label: "Open" },
-    { value: "closed", label: "Closed" },
-    { value: "all", label: "Open and closed" },
-];
 
 const SORT_OPTIONS: Array<{ value: WorkItemSort; label: string }> = [
     { value: "newest", label: "Newest" },
@@ -230,27 +222,6 @@ function WorkItemLabelBadge(props: { label: WorkItemLabel }) {
     );
 }
 
-function UserAvatar(props: { user?: WorkItem["user"] }) {
-    return (
-        <Show
-            when={props.user?.avatar_url}
-            fallback={
-                <div class="grid size-8 place-items-center rounded-full border border-base-300 bg-base-100">
-                    <Octicon name="person" size={16} aria-hidden="true" />
-                </div>
-            }
-        >
-            {(avatarUrl) => (
-                <Avatar
-                    href={avatarUrl()}
-                    size={32}
-                    alt={`${props.user?.login ?? "Unknown user"}'s avatar`}
-                />
-            )}
-        </Show>
-    );
-}
-
 function AssigneeAvatar(props: { assignee: WorkItemUser }) {
     return (
         <div class="avatar" title={props.assignee.login}>
@@ -282,9 +253,13 @@ function AssigneeAvatar(props: { assignee: WorkItemUser }) {
 function WorkItemRow(props: { item: WorkItem; kind: WorkItemKind }) {
     const icon = () => itemIcon(props.item, props.kind);
     const assignees = createMemo(() => props.item.assignees ?? []);
+    const shouldShowState = () =>
+        props.item.state !== "open" ||
+        props.item.draft ||
+        props.item.pull_request?.merged_at;
 
     return (
-        <li class="list-row items-start gap-3 border-b border-base-300 last:border-b-0 hover:bg-base-200/60">
+        <li class="flex items-start gap-3 border-b border-base-300 px-4 py-4 last:border-b-0 hover:bg-base-200/60">
             <div class="pt-1">
                 <Octicon
                     name={icon().name}
@@ -293,101 +268,98 @@ function WorkItemRow(props: { item: WorkItem; kind: WorkItemKind }) {
                     aria-hidden="true"
                 />
             </div>
+
             <div class="min-w-0 flex-1">
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 leading-6">
                     <a
                         href={props.item.html_url}
                         target="_blank"
                         rel="noreferrer"
-                        class="link-hover min-w-0 text-base font-semibold"
+                        class="link-hover min-w-0 text-base font-semibold text-base-content"
                     >
                         {props.item.title || "Untitled"}
                     </a>
-                    <span
-                        class={`badge badge-sm ${stateBadgeClass(props.item, props.kind)}`}
-                    >
-                        {stateLabel(props.item, props.kind)}
-                    </span>
+                    <Show when={shouldShowState()}>
+                        <span
+                            class={`badge badge-sm ${stateBadgeClass(props.item, props.kind)}`}
+                        >
+                            {stateLabel(props.item, props.kind)}
+                        </span>
+                    </Show>
                     <Show when={props.item.locked}>
                         <span class="badge badge-sm badge-warning gap-1">
                             <Octicon name="lock" size={12} aria-hidden="true" />
                             Locked
                         </span>
                     </Show>
+                    <For each={props.item.labels}>
+                        {(label) => <WorkItemLabelBadge label={label} />}
+                    </For>
                 </div>
 
-                <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm opacity-70">
+                <div class="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-base-content/70">
                     <span>#{props.item.number}</span>
                     <span aria-hidden="true">·</span>
-                    <span>
-                        opened{" "}
-                        <time
-                            dateTime={props.item.created_at}
-                            title={formatDate(props.item.created_at)}
-                        >
-                            {relativeTime(props.item.created_at)}
-                        </time>
-                    </span>
                     <Show when={props.item.user?.login}>
                         {(login) => (
                             <>
-                                <span>by</span>
                                 <a
                                     href={
                                         props.item.user?.html_url ?? undefined
                                     }
                                     target="_blank"
                                     rel="noreferrer"
-                                    class="link link-hover"
+                                    class="link-hover"
                                 >
                                     {login()}
                                 </a>
+                                <span>opened</span>
                             </>
                         )}
                     </Show>
-                    <Show when={props.item.updated_at}>
-                        <span>
-                            · updated{" "}
-                            <time
-                                dateTime={props.item.updated_at}
-                                title={formatDate(props.item.updated_at)}
-                            >
-                                {relativeTime(props.item.updated_at)}
-                            </time>
-                        </span>
-                    </Show>
+                    <time
+                        dateTime={props.item.created_at}
+                        title={formatDate(props.item.created_at)}
+                    >
+                        {relativeTime(props.item.created_at)}
+                    </time>
                     <Show when={props.item.milestone?.title}>
                         {(title) => (
-                            <span class="inline-flex items-center gap-1">
-                                <Octicon
-                                    name="milestone"
-                                    size={13}
-                                    aria-hidden="true"
-                                />
-                                {title()}
-                            </span>
+                            <>
+                                <span aria-hidden="true">·</span>
+                                <span class="inline-flex items-center gap-1">
+                                    <Octicon
+                                        name="milestone"
+                                        size={13}
+                                        aria-hidden="true"
+                                    />
+                                    {title()}
+                                </span>
+                            </>
                         )}
                     </Show>
                 </div>
-
-                <Show when={props.item.labels.length > 0}>
-                    <div class="mt-3 flex flex-wrap gap-1.5">
-                        <For each={props.item.labels}>
-                            {(label) => <WorkItemLabelBadge label={label} />}
-                        </For>
-                    </div>
-                </Show>
             </div>
 
-            <div class="hidden shrink-0 flex-col items-end gap-2 sm:flex">
-                <UserAvatar user={props.item.user} />
-                <div
-                    class="flex items-center gap-1 text-sm opacity-70"
-                    title={`${props.item.comments} comments`}
-                >
-                    <Octicon name="comment" size={16} aria-hidden="true" />
-                    {formatCount(props.item.comments)}
-                </div>
+            <div class="hidden min-w-36 shrink-0 items-center justify-end gap-5 pt-1 text-sm text-base-content/70 md:flex">
+                <Show when={props.kind === "pulls" && props.item.comments > 0}>
+                    <div
+                        class="inline-flex items-center gap-1"
+                        title={`${props.item.comments} comments`}
+                    >
+                        <Octicon name="comment" size={16} aria-hidden="true" />
+                        {formatCount(props.item.comments)}
+                    </div>
+                </Show>
+                <Show when={props.kind === "issues" && props.item.comments > 0}>
+                    <div
+                        class="inline-flex items-center gap-1"
+                        title={`${props.item.comments} comments`}
+                    >
+                        <Octicon name="comment" size={16} aria-hidden="true" />
+                        {formatCount(props.item.comments)}
+                    </div>
+                </Show>
                 <Show when={assignees().length > 0}>
                     <div class="avatar-group -space-x-3 rtl:space-x-reverse">
                         <For each={assignees().slice(0, 3)}>
@@ -413,14 +385,12 @@ function ActiveFilters(props: { chips: FilterChip[]; clearHref: string }) {
     return (
         <Show when={props.chips.length > 0}>
             <div class="flex flex-wrap items-center gap-2">
-                <span class="text-sm font-medium opacity-70">
-                    Active filters
-                </span>
+                <span class="text-sm text-base-content/70">Filters</span>
                 <For each={props.chips}>
                     {(chip) => (
                         <a
                             href={chip.href}
-                            class="badge badge-outline gap-1 py-3"
+                            class="badge badge-outline gap-1 py-3 hover:bg-base-200"
                         >
                             {chip.label}
                             <Octicon name="x" size={12} aria-hidden="true" />
@@ -435,246 +405,366 @@ function ActiveFilters(props: { chips: FilterChip[]; clearHref: string }) {
     );
 }
 
-function WorkItemsFilterForm(props: {
+function WorkItemsSearchControls(props: {
     pageProps: RepoWorkItemsPageProps;
     filters: WorkItemFilters;
-    onSubmit: (filters: WorkItemFilters) => void;
-    clearHref: string;
 }) {
-    function handleSubmit(event: SubmitEvent) {
-        event.preventDefault();
-        const form = event.currentTarget as HTMLFormElement;
-        const data = new FormData(form);
-        const next = normalizeWorkItemFilters(
-            {
-                q: String(data.get("q") ?? ""),
-                state: String(data.get("state") ?? ""),
-                sort: String(data.get("sort") ?? ""),
-                labels: String(data.get("labels") ?? ""),
-                noLabels: data.has("noLabels") ? "1" : undefined,
-                author: String(data.get("author") ?? ""),
-                assignee: String(data.get("assignee") ?? ""),
-                unassigned: data.has("unassigned") ? "1" : undefined,
-                milestone: String(data.get("milestone") ?? ""),
-                noMilestone: data.has("noMilestone") ? "1" : undefined,
-                draft: String(data.get("draft") ?? ""),
-                review: String(data.get("review") ?? ""),
-                reason: String(data.get("reason") ?? ""),
-                page: "1",
-            },
-            props.pageProps.kind,
-        );
-        props.onSubmit(next);
-    }
+    const qualifier = () =>
+        props.pageProps.kind === "issues" ? "is:issue" : "is:pr";
+    const stateQualifier = () =>
+        props.filters.state === "all"
+            ? "state:open state:closed"
+            : `state:${props.filters.state}`;
+    const githubBase = () =>
+        `https://github.com/${encodeURIComponent(props.pageProps.profile)}/${encodeURIComponent(props.pageProps.repo)}`;
+    const newHref = () =>
+        props.pageProps.kind === "issues"
+            ? `${githubBase()}/issues/new`
+            : `${githubBase()}/compare`;
 
     return (
-        <form
-            onSubmit={handleSubmit}
-            class="card border border-base-300 bg-base-100 shadow-sm"
-        >
-            <div class="card-body gap-4 p-4 sm:p-5">
-                <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_12rem_12rem_auto]">
-                    <label class="input input-bordered flex items-center gap-2">
-                        <Octicon name="search" size={16} aria-hidden="true" />
-                        <input
-                            name="q"
-                            type="search"
-                            class="grow"
-                            value={props.filters.q}
-                            placeholder={`Search ${itemNoun(props.pageProps.kind)} or use GitHub qualifiers`}
-                            autocomplete="off"
-                        />
-                    </label>
-                    <select
-                        name="state"
-                        class="select select-bordered w-full"
-                        value={props.filters.state}
-                    >
-                        <For each={STATE_OPTIONS}>
-                            {(option) => (
-                                <option value={option.value}>
-                                    {option.label}
-                                </option>
-                            )}
-                        </For>
-                    </select>
-                    <select
-                        name="sort"
-                        class="select select-bordered w-full"
-                        value={props.filters.sort}
-                    >
-                        <For each={SORT_OPTIONS}>
-                            {(option) => (
-                                <option value={option.value}>
-                                    {option.label}
-                                </option>
-                            )}
-                        </For>
-                    </select>
-                    <button type="submit" class="btn btn-primary">
-                        <Octicon name="filter" size={16} aria-hidden="true" />
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+            <div class="join min-w-0 flex-1">
+                <label class="input input-bordered join-item flex h-9 min-h-9 flex-1 items-center gap-1.5 overflow-hidden rounded-r-none border-base-300 bg-base-100 focus-within:outline-2 focus-within:outline-offset-0 focus-within:outline-primary/40">
+                    <span class="rounded bg-info/15 px-0.5 text-info">
+                        {qualifier()}
+                    </span>
+                    <span class="rounded bg-info/15 px-0.5 text-info">
+                        {stateQualifier()}
+                    </span>
+                    <input
+                        name="q"
+                        type="search"
+                        class="min-w-24 grow"
+                        value={props.filters.q}
+                        placeholder={`Search ${itemNoun(props.pageProps.kind)}`}
+                        autocomplete="off"
+                    />
+                </label>
+                <button
+                    type="submit"
+                    class="btn btn-outline join-item h-9 min-h-9 border-base-300 px-4"
+                    aria-label={`Search ${itemNoun(props.pageProps.kind)}`}
+                >
+                    <Octicon name="search" size={18} aria-hidden="true" />
+                </button>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <a
+                    href={`${githubBase()}/labels`}
+                    target="_blank"
+                    rel="noreferrer"
+                    class="btn btn-outline h-9 min-h-9 border-base-300"
+                >
+                    <Octicon name="tag" size={16} aria-hidden="true" />
+                    Labels
+                </a>
+                <a
+                    href={`${githubBase()}/milestones`}
+                    target="_blank"
+                    rel="noreferrer"
+                    class="btn btn-outline h-9 min-h-9 border-base-300"
+                >
+                    <Octicon name="milestone" size={16} aria-hidden="true" />
+                    Milestones
+                </a>
+                <a
+                    href={newHref()}
+                    target="_blank"
+                    rel="noreferrer"
+                    class="btn btn-success h-9 min-h-9"
+                >
+                    {props.pageProps.kind === "issues"
+                        ? "New issue"
+                        : "New pull request"}
+                </a>
+            </div>
+        </div>
+    );
+}
+
+function FilterDropdown(props: { label: string; children: JSX.Element }) {
+    return (
+        <details class="dropdown dropdown-end">
+            <summary class="btn btn-ghost btn-sm h-8 min-h-8 gap-1 px-2 text-sm font-medium text-base-content/75 hover:text-base-content">
+                {props.label}
+                <Octicon name="triangle-down" size={12} aria-hidden="true" />
+            </summary>
+            <div class="menu dropdown-content z-20 mt-2 w-72 rounded-box border border-base-300 bg-base-100 p-4 shadow-xl">
+                {props.children}
+                <div class="mt-4 flex justify-end gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm">
                         Apply
                     </button>
                 </div>
-
-                <div class="collapse collapse-arrow rounded-box border border-base-300 bg-base-200/50">
-                    <input
-                        type="checkbox"
-                        aria-label="Toggle advanced filters"
-                    />
-                    <div class="collapse-title text-sm font-semibold">
-                        Advanced filters
-                    </div>
-                    <div class="collapse-content">
-                        <div class="grid gap-4 pt-2 md:grid-cols-2 xl:grid-cols-3">
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Labels</legend>
-                                <input
-                                    name="labels"
-                                    class="input input-bordered w-full"
-                                    value={props.filters.labels.join(", ")}
-                                    placeholder="bug, help wanted"
-                                    disabled={props.filters.noLabels}
-                                />
-                                <label class="label cursor-pointer justify-start gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="noLabels"
-                                        class="checkbox checkbox-sm"
-                                        checked={props.filters.noLabels}
-                                    />
-                                    <span class="label-text">
-                                        Only items with no labels
-                                    </span>
-                                </label>
-                            </fieldset>
-
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">People</legend>
-                                <input
-                                    name="author"
-                                    class="input input-bordered w-full"
-                                    value={props.filters.author}
-                                    placeholder="Author username"
-                                    autocomplete="off"
-                                />
-                                <input
-                                    name="assignee"
-                                    class="input input-bordered w-full"
-                                    value={props.filters.assignee}
-                                    placeholder="Assignee username"
-                                    autocomplete="off"
-                                    disabled={props.filters.unassigned}
-                                />
-                                <label class="label cursor-pointer justify-start gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="unassigned"
-                                        class="checkbox checkbox-sm"
-                                        checked={props.filters.unassigned}
-                                    />
-                                    <span class="label-text">
-                                        Unassigned only
-                                    </span>
-                                </label>
-                            </fieldset>
-
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">
-                                    Milestone
-                                </legend>
-                                <input
-                                    name="milestone"
-                                    class="input input-bordered w-full"
-                                    value={props.filters.milestone}
-                                    placeholder="Milestone title"
-                                    disabled={props.filters.noMilestone}
-                                />
-                                <label class="label cursor-pointer justify-start gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="noMilestone"
-                                        class="checkbox checkbox-sm"
-                                        checked={props.filters.noMilestone}
-                                    />
-                                    <span class="label-text">No milestone</span>
-                                </label>
-                            </fieldset>
-
-                            <Show when={props.pageProps.kind === "pulls"}>
-                                <fieldset class="fieldset">
-                                    <legend class="fieldset-legend">
-                                        Pull request status
-                                    </legend>
-                                    <select
-                                        name="draft"
-                                        class="select select-bordered w-full"
-                                        value={props.filters.draft}
-                                    >
-                                        <For each={DRAFT_OPTIONS}>
-                                            {(option) => (
-                                                <option value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            )}
-                                        </For>
-                                    </select>
-                                    <select
-                                        name="review"
-                                        class="select select-bordered w-full"
-                                        value={props.filters.review}
-                                    >
-                                        <For each={REVIEW_OPTIONS}>
-                                            {(option) => (
-                                                <option value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            )}
-                                        </For>
-                                    </select>
-                                </fieldset>
-                            </Show>
-
-                            <Show when={props.pageProps.kind === "issues"}>
-                                <fieldset class="fieldset">
-                                    <legend class="fieldset-legend">
-                                        Closed issue reason
-                                    </legend>
-                                    <select
-                                        name="reason"
-                                        class="select select-bordered w-full"
-                                        value={props.filters.reason}
-                                    >
-                                        <For each={REASON_OPTIONS}>
-                                            {(option) => (
-                                                <option value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            )}
-                                        </For>
-                                    </select>
-                                </fieldset>
-                            </Show>
-                        </div>
-
-                        <div class="mt-4 flex flex-wrap gap-2">
-                            <button
-                                type="submit"
-                                class="btn btn-sm btn-primary"
-                            >
-                                Apply advanced filters
-                            </button>
-                            <a
-                                href={props.clearHref}
-                                class="btn btn-sm btn-ghost"
-                            >
-                                Reset filters
-                            </a>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </form>
+        </details>
+    );
+}
+
+function CountPill(props: { count?: number; pending: boolean }) {
+    return (
+        <span class="rounded-full bg-base-300/70 px-2 py-0.5 text-sm font-semibold text-base-content">
+            <Show
+                when={!props.pending}
+                fallback={<span class="loading loading-spinner loading-xs" />}
+            >
+                {formatCount(props.count ?? 0)}
+            </Show>
+        </span>
+    );
+}
+
+function WorkItemsToolbar(props: {
+    pageProps: RepoWorkItemsPageProps;
+    filters: WorkItemFilters;
+    clearHref: string;
+    openHref: string;
+    closedHref: string;
+    openCount?: number;
+    closedCount?: number;
+    openPending: boolean;
+    closedPending: boolean;
+}) {
+    const activeStateClass = (state: WorkItemState) =>
+        props.filters.state === state
+            ? "font-semibold text-base-content"
+            : "font-medium text-base-content/70 hover:text-base-content";
+
+    return (
+        <div class="flex flex-col gap-3 border-b border-base-300 bg-base-200/60 px-4 py-3 lg:flex-row lg:items-center">
+            <input type="hidden" name="state" value={props.filters.state} />
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <a
+                    href={props.openHref}
+                    class={`inline-flex items-center gap-2 ${activeStateClass("open")}`}
+                >
+                    <Octicon
+                        name={
+                            props.pageProps.kind === "issues"
+                                ? "issue-opened"
+                                : "git-pull-request"
+                        }
+                        size={16}
+                        class="text-success"
+                        aria-hidden="true"
+                    />
+                    Open
+                    <CountPill
+                        count={props.openCount}
+                        pending={props.openPending}
+                    />
+                </a>
+                <a
+                    href={props.closedHref}
+                    class={`inline-flex items-center gap-2 ${activeStateClass("closed")}`}
+                >
+                    <Octicon
+                        name={
+                            props.pageProps.kind === "issues"
+                                ? "issue-closed"
+                                : "git-pull-request-closed"
+                        }
+                        size={16}
+                        class="text-base-content/50"
+                        aria-hidden="true"
+                    />
+                    Closed
+                    <CountPill
+                        count={props.closedCount}
+                        pending={props.closedPending}
+                    />
+                </a>
+                <Show when={props.filters.state === "all"}>
+                    <span class="badge badge-outline">Viewing all</span>
+                </Show>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1 lg:ml-auto">
+                <FilterDropdown label="Author">
+                    <fieldset class="fieldset p-0">
+                        <legend class="fieldset-legend">
+                            Filter by author
+                        </legend>
+                        <input
+                            name="author"
+                            class="input input-bordered input-sm w-full"
+                            value={props.filters.author}
+                            placeholder="octocat"
+                            autocomplete="off"
+                        />
+                    </fieldset>
+                </FilterDropdown>
+
+                <FilterDropdown label="Labels">
+                    <fieldset class="fieldset p-0">
+                        <legend class="fieldset-legend">
+                            Filter by labels
+                        </legend>
+                        <input
+                            name="labels"
+                            class="input input-bordered input-sm w-full"
+                            value={props.filters.labels.join(", ")}
+                            placeholder="bug, help wanted"
+                            disabled={props.filters.noLabels}
+                        />
+                        <label class="label cursor-pointer justify-start gap-2">
+                            <input
+                                type="checkbox"
+                                name="noLabels"
+                                class="checkbox checkbox-sm"
+                                checked={props.filters.noLabels}
+                            />
+                            <span class="label-text">Unlabeled only</span>
+                        </label>
+                    </fieldset>
+                </FilterDropdown>
+
+                <FilterDropdown label="Projects">
+                    <p class="text-sm text-base-content/70">
+                        Project filters are not available through GitHub issue
+                        search. Use labels, milestones, and assignees instead.
+                    </p>
+                </FilterDropdown>
+
+                <FilterDropdown label="Milestones">
+                    <fieldset class="fieldset p-0">
+                        <legend class="fieldset-legend">
+                            Filter by milestone
+                        </legend>
+                        <input
+                            name="milestone"
+                            class="input input-bordered input-sm w-full"
+                            value={props.filters.milestone}
+                            placeholder="v1.0"
+                            disabled={props.filters.noMilestone}
+                        />
+                        <label class="label cursor-pointer justify-start gap-2">
+                            <input
+                                type="checkbox"
+                                name="noMilestone"
+                                class="checkbox checkbox-sm"
+                                checked={props.filters.noMilestone}
+                            />
+                            <span class="label-text">No milestone</span>
+                        </label>
+                    </fieldset>
+                </FilterDropdown>
+
+                <FilterDropdown label="Assignees">
+                    <fieldset class="fieldset p-0">
+                        <legend class="fieldset-legend">
+                            Filter by assignee
+                        </legend>
+                        <input
+                            name="assignee"
+                            class="input input-bordered input-sm w-full"
+                            value={props.filters.assignee}
+                            placeholder="octocat"
+                            autocomplete="off"
+                            disabled={props.filters.unassigned}
+                        />
+                        <label class="label cursor-pointer justify-start gap-2">
+                            <input
+                                type="checkbox"
+                                name="unassigned"
+                                class="checkbox checkbox-sm"
+                                checked={props.filters.unassigned}
+                            />
+                            <span class="label-text">Unassigned only</span>
+                        </label>
+                    </fieldset>
+                </FilterDropdown>
+
+                <FilterDropdown label="Types">
+                    <Show
+                        when={props.pageProps.kind === "pulls"}
+                        fallback={
+                            <fieldset class="fieldset p-0">
+                                <legend class="fieldset-legend">
+                                    Closed issue reason
+                                </legend>
+                                <select
+                                    name="reason"
+                                    class="select select-bordered select-sm w-full"
+                                    value={props.filters.reason}
+                                >
+                                    <For each={REASON_OPTIONS}>
+                                        {(option) => (
+                                            <option value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        )}
+                                    </For>
+                                </select>
+                            </fieldset>
+                        }
+                    >
+                        <fieldset class="fieldset p-0">
+                            <legend class="fieldset-legend">
+                                Pull request status
+                            </legend>
+                            <select
+                                name="draft"
+                                class="select select-bordered select-sm w-full"
+                                value={props.filters.draft}
+                            >
+                                <For each={DRAFT_OPTIONS}>
+                                    {(option) => (
+                                        <option value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    )}
+                                </For>
+                            </select>
+                            <select
+                                name="review"
+                                class="select select-bordered select-sm w-full"
+                                value={props.filters.review}
+                            >
+                                <For each={REVIEW_OPTIONS}>
+                                    {(option) => (
+                                        <option value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    )}
+                                </For>
+                            </select>
+                        </fieldset>
+                    </Show>
+                </FilterDropdown>
+
+                <FilterDropdown
+                    label={
+                        SORT_OPTIONS.find(
+                            (option) => option.value === props.filters.sort,
+                        )?.label ?? "Newest"
+                    }
+                >
+                    <fieldset class="fieldset p-0">
+                        <legend class="fieldset-legend">Sort by</legend>
+                        <select
+                            name="sort"
+                            class="select select-bordered select-sm w-full"
+                            value={props.filters.sort}
+                        >
+                            <For each={SORT_OPTIONS}>
+                                {(option) => (
+                                    <option value={option.value}>
+                                        {option.label}
+                                    </option>
+                                )}
+                            </For>
+                        </select>
+                    </fieldset>
+                </FilterDropdown>
+
+                <a href={props.clearHref} class="btn btn-ghost btn-sm">
+                    Reset
+                </a>
+            </div>
+        </div>
     );
 }
 
@@ -830,14 +920,6 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
         filterHref(props, defaultWorkItemFilters(props.kind)),
     );
     const chips = createMemo(() => buildFilterChips(props, filters()));
-    const queryPreview = createMemo(() =>
-        buildWorkItemsSearchQuery({
-            owner: props.profile,
-            repo: props.repo,
-            kind: props.kind,
-            filters: filters(),
-        }),
-    );
     const workItemsQuery = useQuery(() => ({
         queryKey: [
             "workItems",
@@ -855,6 +937,44 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
             }),
         keepPreviousData: true,
     }));
+    const openCountQuery = useQuery(() => ({
+        queryKey: [
+            "workItemCount",
+            props.profile,
+            props.repo,
+            props.kind,
+            "open",
+            { ...filters(), state: "open", page: 1 },
+        ],
+        queryFn: () =>
+            fetchWorkItems({
+                owner: props.profile,
+                repo: props.repo,
+                kind: props.kind,
+                filters: { ...filters(), state: "open", page: 1 },
+                perPage: 1,
+            }),
+        keepPreviousData: true,
+    }));
+    const closedCountQuery = useQuery(() => ({
+        queryKey: [
+            "workItemCount",
+            props.profile,
+            props.repo,
+            props.kind,
+            "closed",
+            { ...filters(), state: "closed", page: 1 },
+        ],
+        queryFn: () =>
+            fetchWorkItems({
+                owner: props.profile,
+                repo: props.repo,
+                kind: props.kind,
+                filters: { ...filters(), state: "closed", page: 1 },
+                perPage: 1,
+            }),
+        keepPreviousData: true,
+    }));
     const visibleTotal = createMemo(() =>
         Math.min(workItemsQuery.data?.totalCount ?? 0, SEARCH_RESULT_LIMIT),
     );
@@ -867,189 +987,171 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
         setSearchParams(workItemFiltersToSearchParams(next));
     }
 
+    function handleFiltersSubmit(event: SubmitEvent) {
+        event.preventDefault();
+        const form = event.currentTarget as HTMLFormElement;
+        const data = new FormData(form);
+        const current = filters();
+        const next = normalizeWorkItemFilters(
+            {
+                q: String(data.get("q") ?? ""),
+                state: String(data.get("state") ?? current.state),
+                sort: String(data.get("sort") ?? current.sort),
+                labels: data.has("labels")
+                    ? String(data.get("labels") ?? "")
+                    : current.labels.join(","),
+                noLabels: data.has("noLabels") ? "1" : undefined,
+                author: data.has("author")
+                    ? String(data.get("author") ?? "")
+                    : current.author,
+                assignee: data.has("assignee")
+                    ? String(data.get("assignee") ?? "")
+                    : current.assignee,
+                unassigned: data.has("unassigned") ? "1" : undefined,
+                milestone: data.has("milestone")
+                    ? String(data.get("milestone") ?? "")
+                    : current.milestone,
+                noMilestone: data.has("noMilestone") ? "1" : undefined,
+                draft: data.has("draft")
+                    ? String(data.get("draft") ?? "")
+                    : current.draft,
+                review: data.has("review")
+                    ? String(data.get("review") ?? "")
+                    : current.review,
+                reason: data.has("reason")
+                    ? String(data.get("reason") ?? "")
+                    : current.reason,
+                page: "1",
+            },
+            props.kind,
+        );
+        applyFilters(next);
+    }
+
     return (
         <RepoPageLayout
             profile={props.profile}
             repo={props.repo}
             active={props.kind}
         >
-            <section class="space-y-5">
-                <div class="flex flex-col gap-4 rounded-box border border-base-300 bg-base-100 p-5 shadow-sm md:flex-row md:items-center">
-                    <div class="grid size-12 place-items-center rounded-box bg-primary text-primary-content shadow-sm">
-                        <Octicon
-                            name={
-                                props.kind === "issues"
-                                    ? "issue-opened"
-                                    : "git-pull-request"
-                            }
-                            size={24}
-                            aria-hidden="true"
+            <section class="space-y-4" aria-label={pageTitle(props.kind)}>
+                <form onSubmit={handleFiltersSubmit} class="space-y-4">
+                    <WorkItemsSearchControls
+                        pageProps={props}
+                        filters={filters()}
+                    />
+
+                    <ActiveFilters chips={chips()} clearHref={clearHref()} />
+
+                    <div class="overflow-visible rounded-box border border-base-300 bg-base-100 shadow-sm">
+                        <WorkItemsToolbar
+                            pageProps={props}
+                            filters={filters()}
+                            clearHref={clearHref()}
+                            openHref={withFilter(props, filters(), {
+                                state: "open",
+                            })}
+                            closedHref={withFilter(props, filters(), {
+                                state: "closed",
+                            })}
+                            openCount={openCountQuery.data?.totalCount}
+                            closedCount={closedCountQuery.data?.totalCount}
+                            openPending={openCountQuery.isPending}
+                            closedPending={closedCountQuery.isPending}
                         />
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm uppercase tracking-[0.2em] opacity-60">
-                            {props.profile}/{props.repo}
-                        </p>
-                        <h1 class="text-2xl font-bold">
-                            {pageTitle(props.kind)}
-                        </h1>
-                        <p class="text-sm opacity-70">
-                            Search, sort, and filter repository{" "}
-                            {itemNoun(props.kind)} with GitHub's issue search
-                            syntax.
-                        </p>
-                    </div>
-                    <div class="stats stats-vertical bg-base-200 shadow-none sm:stats-horizontal">
-                        <div class="stat py-3">
-                            <div class="stat-title">Matched</div>
-                            <div class="stat-value text-2xl">
-                                <Show
-                                    when={!workItemsQuery.isPending}
-                                    fallback={
-                                        <span class="loading loading-spinner loading-sm" />
-                                    }
-                                >
-                                    {formatCount(
-                                        workItemsQuery.data?.totalCount ?? 0,
-                                    )}
-                                </Show>
-                            </div>
-                            <div class="stat-desc">
-                                {workItemsQuery.data?.totalCount &&
-                                workItemsQuery.data.totalCount >
-                                    SEARCH_RESULT_LIMIT
-                                    ? "First 1,000 searchable"
-                                    : itemNoun(props.kind)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <WorkItemsFilterForm
-                    pageProps={props}
-                    filters={filters()}
-                    onSubmit={applyFilters}
-                    clearHref={clearHref()}
-                />
-
-                <ActiveFilters chips={chips()} clearHref={clearHref()} />
-
-                <div class="rounded-box border border-base-300 bg-base-100 shadow-sm">
-                    <div class="flex flex-col gap-2 border-b border-base-300 p-4 sm:flex-row sm:items-center">
-                        <div class="flex flex-wrap items-center gap-2 font-medium">
-                            <span>{pageTitle(props.kind)}</span>
-                            <span class="badge badge-ghost">
-                                Page {filters().page}
-                            </span>
-                            <Show
-                                when={
-                                    workItemsQuery.isFetching &&
-                                    !workItemsQuery.isPending
-                                }
-                            >
-                                <span
-                                    class="loading loading-spinner loading-xs"
-                                    aria-label="Refreshing"
-                                />
-                            </Show>
-                        </div>
-                        <div
-                            class="min-w-0 text-xs opacity-60 sm:ml-auto sm:max-w-xl sm:truncate"
-                            title={queryPreview()}
-                        >
-                            {queryPreview()}
-                        </div>
-                    </div>
-
-                    <Switch>
-                        <Match when={workItemsQuery.isPending}>
-                            <div class="grid min-h-64 place-items-center p-8 text-center">
-                                <div>
-                                    <span class="loading loading-spinner loading-lg text-primary" />
-                                    <p class="mt-3 font-medium">
-                                        Loading {itemNoun(props.kind)}…
-                                    </p>
-                                </div>
-                            </div>
-                        </Match>
-                        <Match when={workItemsQuery.isError}>
-                            <div class="p-4">
-                                <div
-                                    role="alert"
-                                    class="alert alert-error items-start"
-                                >
-                                    <Octicon
-                                        name="alert"
-                                        size={20}
-                                        aria-hidden="true"
-                                    />
+                        <Switch>
+                            <Match when={workItemsQuery.isPending}>
+                                <div class="grid min-h-64 place-items-center p-8 text-center">
                                     <div>
-                                        <h2 class="font-semibold">
-                                            Unable to load{" "}
-                                            {itemNoun(props.kind)}
-                                        </h2>
-                                        <p class="text-sm">
-                                            {getErrorMessage(
-                                                workItemsQuery.error,
-                                            )}
+                                        <span class="loading loading-spinner loading-lg text-primary" />
+                                        <p class="mt-3 font-medium">
+                                            Loading {itemNoun(props.kind)}…
                                         </p>
                                     </div>
                                 </div>
-                            </div>
-                        </Match>
-                        <Match when={workItemsQuery.data}>
-                            {(result) => (
-                                <>
-                                    <Show when={result().incompleteResults}>
-                                        <div class="p-4 pb-0">
-                                            <div
-                                                role="alert"
-                                                class="alert alert-warning"
-                                            >
-                                                <Octicon
-                                                    name="alert"
-                                                    size={18}
-                                                    aria-hidden="true"
-                                                />
-                                                <span>
-                                                    GitHub returned partial
-                                                    results. Try narrowing your
-                                                    filters.
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Show>
-
-                                    <Show
-                                        when={result().items.length > 0}
-                                        fallback={
-                                            <EmptyWorkItems
-                                                pageProps={props}
-                                                filters={filters()}
-                                                totalCount={result().totalCount}
-                                                clearHref={clearHref()}
-                                            />
-                                        }
+                            </Match>
+                            <Match when={workItemsQuery.isError}>
+                                <div class="p-4">
+                                    <div
+                                        role="alert"
+                                        class="alert alert-error items-start"
                                     >
-                                        <ul class="list bg-base-100">
-                                            <For each={result().items}>
-                                                {(item) => (
-                                                    <WorkItemRow
-                                                        item={item}
-                                                        kind={props.kind}
-                                                    />
+                                        <Octicon
+                                            name="alert"
+                                            size={20}
+                                            aria-hidden="true"
+                                        />
+                                        <div>
+                                            <h2 class="font-semibold">
+                                                Unable to load{" "}
+                                                {itemNoun(props.kind)}
+                                            </h2>
+                                            <p class="text-sm">
+                                                {getErrorMessage(
+                                                    workItemsQuery.error,
                                                 )}
-                                            </For>
-                                        </ul>
-                                    </Show>
-                                </>
-                            )}
-                        </Match>
-                    </Switch>
-                </div>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Match>
+                            <Match when={workItemsQuery.data}>
+                                {(result) => (
+                                    <>
+                                        <Show when={result().incompleteResults}>
+                                            <div class="p-4 pb-0">
+                                                <div
+                                                    role="alert"
+                                                    class="alert alert-warning"
+                                                >
+                                                    <Octicon
+                                                        name="alert"
+                                                        size={18}
+                                                        aria-hidden="true"
+                                                    />
+                                                    <span>
+                                                        GitHub returned partial
+                                                        results. Try narrowing
+                                                        your filters.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </Show>
+
+                                        <Show
+                                            when={result().items.length > 0}
+                                            fallback={
+                                                <EmptyWorkItems
+                                                    pageProps={props}
+                                                    filters={filters()}
+                                                    totalCount={
+                                                        result().totalCount
+                                                    }
+                                                    clearHref={clearHref()}
+                                                />
+                                            }
+                                        >
+                                            <ul class="bg-base-100">
+                                                <For each={result().items}>
+                                                    {(item) => (
+                                                        <WorkItemRow
+                                                            item={item}
+                                                            kind={props.kind}
+                                                        />
+                                                    )}
+                                                </For>
+                                            </ul>
+                                        </Show>
+                                    </>
+                                )}
+                            </Match>
+                        </Switch>
+                    </div>
+                </form>
 
                 <div class="flex flex-col items-center justify-between gap-3 sm:flex-row">
-                    <p class="text-sm opacity-70">
+                    <p class="text-sm text-base-content/70">
                         <Show when={workItemsQuery.data}>
                             {(result) => (
                                 <>
@@ -1065,6 +1167,14 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                                         {" "}
                                         (GitHub search caps browsing at 1,000
                                         results)
+                                    </Show>
+                                    <Show
+                                        when={
+                                            workItemsQuery.isFetching &&
+                                            !workItemsQuery.isPending
+                                        }
+                                    >
+                                        <span class="ml-2 loading loading-spinner loading-xs" />
                                     </Show>
                                 </>
                             )}
