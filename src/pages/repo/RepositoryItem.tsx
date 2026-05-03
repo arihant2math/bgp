@@ -4,6 +4,7 @@ import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 import {For, Match, Switch} from "solid-js";
 import FileList from "../../components/FileList.tsx";
 import CodeRenderer from "../../components/CodeRenderer.tsx";
+import MarkdownRenderer from "../../components/MarkdownRenderer.tsx";
 import {repoHref} from "../../lib/hrefGen.ts";
 
 export type RepositoryItemProps = {
@@ -18,6 +19,11 @@ function decodeBase64Content(content: string) {
     const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
 
     return new TextDecoder().decode(bytes);
+}
+
+function isMarkdownFile(path: string) {
+    return /(?:^|\/)(?:readme|license|contributing|code_of_conduct|security|support)(?:\.[^.]+)?$/i.test(path)
+        || /\.(?:md|markdown|mdown|mkdn|mkd)$/i.test(path);
 }
 
 function RepositoryItem(props: RepositoryItemProps) {
@@ -63,12 +69,20 @@ function RepositoryItem(props: RepositoryItemProps) {
                             <FileList contents={contentsQuery.data} tree={props.tree} repoUrl={repoHref(props.profile, props.repo)}/>
                         </Match>
                         <Match when={contentsQuery.data.type === "file"}>
-                            <div>
-                                <CodeRenderer
-                                    code={decodeBase64Content(contentsQuery.data.content)}
-                                    path={contentsQuery.data.path}
-                                />
-                            </div>
+                            <Switch>
+                                <Match when={isMarkdownFile(contentsQuery.data.path)}>
+                                    <MarkdownRenderer
+                                        markdown={decodeBase64Content(contentsQuery.data.content)}
+                                        context={`${props.profile}/${props.repo}`}
+                                    />
+                                </Match>
+                                <Match when={!isMarkdownFile(contentsQuery.data.path)}>
+                                    <CodeRenderer
+                                        code={decodeBase64Content(contentsQuery.data.content)}
+                                        path={contentsQuery.data.path}
+                                    />
+                                </Match>
+                            </Switch>
                         </Match>
                     </Switch>
                 </Match>
