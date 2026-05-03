@@ -6,7 +6,7 @@ export function getOctokit() {
     });
 }
 
-export function parseRestOctokitResponse(response) {
+export function parseRestOctokitResponse(response: { data: any }): any {
     console.log(response);
     return response.data;
 }
