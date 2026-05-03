@@ -1,5 +1,6 @@
-import type { Component } from "solid-js";
+import { UnderlineNav } from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
+import type { Component } from "solid-js";
 import { profileHref } from "../lib/hrefGen.ts";
 
 export type UserTab = "overview" | "repositories" | "stars";
@@ -9,37 +10,37 @@ type UserNavbarProps = {
     active: UserTab;
 };
 
-function tabClass(props: UserNavbarProps, tab: string) {
-    return `tab ${props.active === tab ? "tab-active" : ""} gap-2`;
-}
-
 const UserNavbar: Component<UserNavbarProps> = (props) => {
     return (
-        <nav>
-            <div role="tablist" class="tabs tabs-border">
-                <a
-                    href={profileHref(props.profile)}
-                    class={tabClass(props, "overview")}
-                >
-                    <Octicon name="book" size={16} aria-hidden="true" />
-                    Overview
-                </a>
-                <a
-                    href={profileHref(props.profile, "?tab=repositories")}
-                    class={tabClass(props, "repositories")}
-                >
-                    <Octicon name="repo" size={16} aria-hidden="true" />
-                    Repositories
-                </a>
-                <a
-                    href={profileHref(props.profile, "?tab=stars")}
-                    class={tabClass(props, "stars")}
-                >
-                    <Octicon name="star" size={16} aria-hidden="true" />
-                    Stars
-                </a>
-            </div>
-        </nav>
+        <UnderlineNav
+            aria-label="User"
+            variant="flush"
+            class="px-4"
+        >
+            <UnderlineNav.Item
+                href={profileHref(props.profile)}
+                aria-current={props.active === "overview" ? "page" : undefined}
+                leadingVisual={<Octicon name="book" size={16} aria-hidden="true" />}
+            >
+                Overview
+            </UnderlineNav.Item>
+            <UnderlineNav.Item
+                href={profileHref(props.profile, "?tab=repositories")}
+                aria-current={
+                    props.active === "repositories" ? "page" : undefined
+                }
+                leadingVisual={<Octicon name="repo" size={16} aria-hidden="true" />}
+            >
+                Repositories
+            </UnderlineNav.Item>
+            <UnderlineNav.Item
+                href={profileHref(props.profile, "?tab=stars")}
+                aria-current={props.active === "stars" ? "page" : undefined}
+                leadingVisual={<Octicon name="star" size={16} aria-hidden="true" />}
+            >
+                Stars
+            </UnderlineNav.Item>
+        </UnderlineNav>
     );
 };
 

@@ -1,5 +1,6 @@
-import type { Component } from "solid-js";
+import { UnderlineNav } from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
+import type { Component } from "solid-js";
 import { profileHref } from "../lib/hrefGen.ts";
 
 export type OrganizationTab = "overview" | "repositories" | "teams" | "people";
@@ -9,27 +10,30 @@ type OrganizationNavbarProps = {
     active: OrganizationTab;
 };
 
-function tabClass(props: OrganizationNavbarProps, tab: string) {
-    return `tab ${props.active === tab ? "tab-active" : ""} gap-2`;
-}
-
 const OrganizationNavbar: Component<OrganizationNavbarProps> = (props) => {
     return (
-        <nav>
-            <div role="tablist" class="tabs tabs-border">
-                <a
-                    href={profileHref(props.profile)}
-                    class={tabClass(props, "overview")}
-                >
-                    <Octicon name="book" size={16} aria-hidden="true" />
-                    Overview
-                </a>
-                <a href="#" class={tabClass(props, "repositories")}>
-                    <Octicon name="repo" size={16} aria-hidden="true" />
-                    Repositories
-                </a>
-            </div>
-        </nav>
+        <UnderlineNav
+            aria-label="Organization"
+            variant="flush"
+            class="px-4"
+        >
+            <UnderlineNav.Item
+                href={profileHref(props.profile)}
+                aria-current={props.active === "overview" ? "page" : undefined}
+                leadingVisual={<Octicon name="book" size={16} aria-hidden="true" />}
+            >
+                Overview
+            </UnderlineNav.Item>
+            <UnderlineNav.Item
+                href={profileHref(props.profile, "?tab=repositories")}
+                aria-current={
+                    props.active === "repositories" ? "page" : undefined
+                }
+                leadingVisual={<Octicon name="repo" size={16} aria-hidden="true" />}
+            >
+                Repositories
+            </UnderlineNav.Item>
+        </UnderlineNav>
     );
 };
 
