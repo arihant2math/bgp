@@ -1,5 +1,5 @@
 import { useSearchParams } from "@solidjs/router";
-import { Button, Label, Spinner } from "@primer/solid";
+import { Button, Label, Pagination, Spinner } from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo } from "solid-js";
@@ -193,32 +193,18 @@ function Commits(props: CommitsProps) {
                                 </ul>
                             </Show>
 
-                            <div class="mt-6 flex justify-center gap-2">
-                                <Show
-                                    when={history().hasPrevious}
-                                    fallback={
-                                        <Button disabled>Previous</Button>
-                                    }
-                                >
-                                    <Button
-                                        as="a"
-                                        href={commitPageHref(props, page() - 1)}
-                                    >
-                                        Previous
-                                    </Button>
-                                </Show>
-                                <Show
-                                    when={history().hasNext}
-                                    fallback={<Button disabled>Next</Button>}
-                                >
-                                    <Button
-                                        as="a"
-                                        href={commitPageHref(props, page() + 1)}
-                                    >
-                                        Next
-                                    </Button>
-                                </Show>
-                            </div>
+                            <Pagination
+                                currentPage={page()}
+                                pageCount={
+                                    page() + (history().hasNext ? 1 : 0)
+                                }
+                                hrefBuilder={(nextPage) =>
+                                    commitPageHref(props, nextPage)
+                                }
+                                showPages={false}
+                                aria-label="Commit history pagination"
+                                class="mt-6"
+                            />
                         </>
                     )}
                 </Match>

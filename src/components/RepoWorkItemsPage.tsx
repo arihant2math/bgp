@@ -6,6 +6,7 @@ import {
     Flash,
     IssueLabel,
     Label,
+    Pagination,
     Select,
     Spinner,
     TextInput,
@@ -1034,9 +1035,8 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
     const visibleTotal = createMemo(() =>
         Math.min(workItemsQuery.data?.totalCount ?? 0, SEARCH_RESULT_LIMIT),
     );
-    const hasPrevious = createMemo(() => filters().page > 1);
-    const hasNext = createMemo(
-        () => filters().page * WORK_ITEMS_PER_PAGE < visibleTotal(),
+    const totalPages = createMemo(() =>
+        Math.max(1, Math.ceil(visibleTotal() / WORK_ITEMS_PER_PAGE)),
     );
 
     function applyFilters(next: WorkItemFilters) {
@@ -1242,39 +1242,15 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                             )}
                         </Show>
                     </p>
-                    <div class="flex items-center gap-2">
-                        <Show
-                            when={hasPrevious()}
-                            fallback={<Button disabled>Previous</Button>}
-                        >
-                            <Button
-                                as="a"
-                                href={pageHref(
-                                    props,
-                                    filters(),
-                                    filters().page - 1,
-                                )}
-                            >
-                                Previous
-                            </Button>
-                        </Show>
-                        <Label variant="secondary">Page {filters().page}</Label>
-                        <Show
-                            when={hasNext()}
-                            fallback={<Button disabled>Next</Button>}
-                        >
-                            <Button
-                                as="a"
-                                href={pageHref(
-                                    props,
-                                    filters(),
-                                    filters().page + 1,
-                                )}
-                            >
-                                Next
-                            </Button>
-                        </Show>
-                    </div>
+                    <Pagination
+                        currentPage={filters().page}
+                        pageCount={totalPages()}
+                        hrefBuilder={(nextPage) =>
+                            pageHref(props, filters(), nextPage)
+                        }
+                        aria-label={`${pageTitle(props.kind)} pagination`}
+                        class="w-full sm:ml-auto sm:w-auto"
+                    />
                 </div>
             </section>
         </RepoPageLayout>
