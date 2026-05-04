@@ -1,4 +1,4 @@
-import { Card, Label } from "@primer/solid";
+import { Card, Heading, Label, Link, Text } from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
 import approx from "approximate-number";
 import { Show, type Component } from "solid-js";
@@ -31,48 +31,55 @@ const RepoCard: Component<RepoCardProps> = (props) => {
                             class="shrink-0 opacity-80"
                             aria-hidden="true"
                         />
-                        <a
-                            href={href()}
-                            class="text-md leading-tight font-semibold text-[var(--fgColor-accent)] hover:underline"
-                        >
-                            {props.owner}/{props.name}
-                        </a>
+                        <Heading as="h3" size="small">
+                            <Link href={href()}>
+                                {props.owner}/{props.name}
+                            </Link>
+                        </Heading>
                         <Label variant="secondary" size="small">
                             {visibility()}
                         </Label>
                     </div>
                     <Show when={props.description}>
-                        <p class="mt-4 text-sm leading-snug text-[var(--fgColor-muted)]">
+                        <Text
+                            as="p"
+                            size="small"
+                            style={{
+                                color: "var(--fgColor-muted)",
+                                "margin-top": "1rem",
+                                "line-height": "1.4",
+                            }}
+                        >
                             {props.description}
-                        </p>
+                        </Text>
                     </Show>
                 </div>
 
-                <div class="mt-6 flex items-center gap-8 text-md opacity-90">
+                <div class="mt-6 flex items-center gap-8 opacity-90">
                     <Show when={props.language}>
-                        <span class="flex items-center gap-2">
+                        <Text as="span" class="flex items-center gap-2">
                             <span
                                 class="size-3 rounded-full border border-current opacity-60"
                                 aria-hidden="true"
                             />
                             {props.language}
-                        </span>
+                        </Text>
                     </Show>
                     <Show when={(props.stars ?? 0) > 0}>
-                        <span class="flex items-center gap-2">
+                        <Text as="span" class="flex items-center gap-2">
                             <Octicon name="star" size={16} aria-hidden="true" />
                             {approx(props.stars ?? 0)}
-                        </span>
+                        </Text>
                     </Show>
                     <Show when={(props.forks ?? 0) > 0}>
-                        <span class="flex items-center gap-2">
+                        <Text as="span" class="flex items-center gap-2">
                             <Octicon
                                 name="repo-forked"
                                 size={16}
                                 aria-hidden="true"
                             />
                             {approx(props.forks ?? 0)}
-                        </span>
+                        </Text>
                     </Show>
                 </div>
             </div>

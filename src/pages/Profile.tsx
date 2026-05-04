@@ -1,8 +1,9 @@
+import { Heading, Text } from "@primer/solid";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch } from "solid-js";
 import OrganizationPageLayout from "../components/OrganizationPageLayout.tsx";
-import UserPageLayout from "../components/UserPageLayout.tsx";
 import RepoCard from "../components/RepoCard.tsx";
+import UserPageLayout from "../components/UserPageLayout.tsx";
 import { getOctokit, parseRestOctokitResponse } from "../lib/octokit.ts";
 
 export type ProfileProps = {
@@ -32,13 +33,15 @@ function Profile(props: ProfileProps) {
 
     const repositoryCards = () => (
         <section>
-            <h2 class="mb-3 font-semibold">Repositories</h2>
+            <Heading as="h2" size="small" class="mb-3">
+                Repositories
+            </Heading>
             <Switch>
                 <Match when={repositoriesQuery.isPending}>
-                    Loading repositories...
+                    <Text>Loading repositories...</Text>
                 </Match>
                 <Match when={repositoriesQuery.isError}>
-                    Error loading repositories
+                    <Text>Error loading repositories</Text>
                 </Match>
                 <Match when={repositoriesQuery.isSuccess}>
                     <div class="grid gap-4 md:grid-cols-2">
@@ -58,7 +61,7 @@ function Profile(props: ProfileProps) {
                         </For>
                     </div>
                     <Show when={repositoriesQuery.data.length === 0}>
-                        <p>No public repositories.</p>
+                        <Text as="p">No public repositories.</Text>
                     </Show>
                 </Match>
             </Switch>
@@ -67,8 +70,12 @@ function Profile(props: ProfileProps) {
 
     return (
         <Switch>
-            <Match when={profileQuery.isPending}>Loading ...</Match>
-            <Match when={profileQuery.isError}>Error</Match>
+            <Match when={profileQuery.isPending}>
+                <Text>Loading ...</Text>
+            </Match>
+            <Match when={profileQuery.isError}>
+                <Text>Error</Text>
+            </Match>
             <Match
                 when={
                     profileQuery.isSuccess &&

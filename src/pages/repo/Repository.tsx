@@ -1,8 +1,8 @@
-import { Button, Label, Spinner } from "@primer/solid";
+import { Button, Heading, Label, Link, Spinner, Text } from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
 import { useQuery } from "@tanstack/solid-query";
-import { For, Match, Show, Switch } from "solid-js";
 import { approximateNumber as approx } from "approximate-number";
+import { For, Match, Show, Switch } from "solid-js";
 import Avatar from "../../components/Avatar.tsx";
 import BranchSelector from "../../components/BranchSelector.tsx";
 import FileList from "../../components/FileList.tsx";
@@ -97,21 +97,29 @@ function Repository(props: RepositoryProps) {
                             srText={null}
                             aria-hidden="true"
                         />
-                        Loading…
+                        <Text as="span" size="small">
+                            Loading…
+                        </Text>
                     </div>
                 </Match>
-                <Match when={metadataQuery.isError}>Error</Match>
+                <Match when={metadataQuery.isError}>
+                    <Text>Error</Text>
+                </Match>
                 <Match when={metadataQuery.isSuccess}>
                     <>
                         <div class="flex min-h-12 flex-row items-center gap-2">
-                            <h1 class="flex flex-row items-center gap-2 text-xl">
+                            <Heading
+                                as="h1"
+                                size="large"
+                                class="flex flex-row items-center gap-2"
+                            >
                                 <Avatar
                                     href={metadataQuery.data.owner.avatar_url}
                                     size={24}
                                     alt={`${metadataQuery.data.owner.login}'s avatar`}
                                 />
                                 {metadataQuery.data.name}
-                            </h1>
+                            </Heading>
                             <Label variant="secondary" size="small">
                                 {metadataQuery.data.visibility}
                             </Label>
@@ -189,11 +197,13 @@ function Repository(props: RepositoryProps) {
                                                 srText={null}
                                                 aria-hidden="true"
                                             />
-                                            Loading…
+                                            <Text as="span" size="small">
+                                                Loading…
+                                            </Text>
                                         </div>
                                     </Match>
                                     <Match when={contentsQuery.isError}>
-                                        Error
+                                        <Text>Error</Text>
                                     </Match>
                                     <Match when={contentsQuery.isSuccess}>
                                         <FileList
@@ -251,8 +261,12 @@ function Repository(props: RepositoryProps) {
                             </div>
                             <div class="flex flex-1 flex-col gap-4">
                                 <div>
-                                    <b>About</b>
-                                    <p>{metadataQuery.data.description}</p>
+                                    <Heading as="h2" size="small">
+                                        About
+                                    </Heading>
+                                    <Text as="p">
+                                        {metadataQuery.data.description}
+                                    </Text>
                                 </div>
 
                                 <Show
@@ -264,12 +278,11 @@ function Repository(props: RepositoryProps) {
                                             size={16}
                                             aria-hidden="true"
                                         />
-                                        <a
+                                        <Link
                                             href={metadataQuery.data.homepage}
-                                            class="text-[var(--fgColor-accent)] hover:underline"
                                         >
                                             {metadataQuery.data.homepage}
-                                        </a>
+                                        </Link>
                                     </div>
                                 </Show>
                                 <div class="flex flex-wrap items-start gap-2">
@@ -292,10 +305,10 @@ function Repository(props: RepositoryProps) {
                                             name="law"
                                             size={16}
                                             aria-hidden="true"
-                                        />{" "}
-                                        <p class="text-sm">
+                                        />
+                                        <Text as="p" size="small">
                                             {metadataQuery.data.license.name}
-                                        </p>
+                                        </Text>
                                     </div>
                                 </Show>
 
@@ -305,32 +318,41 @@ function Repository(props: RepositoryProps) {
                                             name="star"
                                             size={16}
                                             aria-hidden="true"
-                                        />{" "}
-                                        {approx(
-                                            metadataQuery.data.stargazers_count,
-                                        )}{" "}
-                                        stars
+                                        />
+                                        <Text as="span">
+                                            {approx(
+                                                metadataQuery.data
+                                                    .stargazers_count,
+                                            )}{" "}
+                                            stars
+                                        </Text>
                                     </div>
                                     <div class="flex items-center flex-row gap-2">
                                         <Octicon
                                             name="eye"
                                             size={16}
                                             aria-hidden="true"
-                                        />{" "}
-                                        {approx(
-                                            metadataQuery.data
-                                                .subscribers_count,
-                                        )}{" "}
-                                        watching
+                                        />
+                                        <Text as="span">
+                                            {approx(
+                                                metadataQuery.data
+                                                    .subscribers_count,
+                                            )}{" "}
+                                            watching
+                                        </Text>
                                     </div>
                                     <div class="flex items-center flex-row gap-2">
                                         <Octicon
                                             name="repo-forked"
                                             size={16}
                                             aria-hidden="true"
-                                        />{" "}
-                                        {approx(metadataQuery.data.forks_count)}{" "}
-                                        forks
+                                        />
+                                        <Text as="span">
+                                            {approx(
+                                                metadataQuery.data.forks_count,
+                                            )}{" "}
+                                            forks
+                                        </Text>
                                     </div>
                                 </div>
                             </div>

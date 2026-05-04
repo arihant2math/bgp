@@ -1,5 +1,13 @@
 import { useSearchParams } from "@solidjs/router";
-import { Button, Label, Pagination, Spinner } from "@primer/solid";
+import {
+    Button,
+    Heading,
+    Label,
+    Link,
+    Pagination,
+    Spinner,
+    Text,
+} from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo } from "solid-js";
@@ -63,24 +71,30 @@ function CommitRow(props: { commit: CommitSummary }) {
                 )}
             </Show>
             <div class="min-w-0 flex-1">
-                <div class="font-medium">
+                <Heading as="h2" size="small">
                     <Show
                         when={props.commit.commitUrl}
                         fallback={props.commit.message}
                     >
                         {(commitUrl) => (
-                            <a
+                            <Link
                                 href={commitUrl()}
                                 target="_blank"
                                 rel="noreferrer"
-                                class="text-[var(--fgColor-accent)] hover:underline"
                             >
                                 {props.commit.message}
-                            </a>
+                            </Link>
                         )}
                     </Show>
-                </div>
-                <div class="mt-1 text-sm text-[var(--fgColor-muted)]">
+                </Heading>
+                <Text
+                    as="p"
+                    size="small"
+                    style={{
+                        color: "var(--fgColor-muted)",
+                        "margin-top": "0.25rem",
+                    }}
+                >
                     {authorsText(props.commit)} committed{" "}
                     <time
                         dateTime={props.commit.committedDate}
@@ -92,7 +106,7 @@ function CommitRow(props: { commit: CommitSummary }) {
                             props.commit.committedDate,
                         ).toLocaleDateString()}
                     </time>
-                </div>
+                </Text>
             </div>
             <Show
                 when={props.commit.commitUrl}
@@ -152,7 +166,9 @@ function Commits(props: CommitsProps) {
     return (
         <RepoPageLayout profile={props.profile} repo={props.repo} active="code">
             <div class="mb-4 flex flex-wrap items-center gap-3">
-                <h1 class="text-xl font-semibold">Commit history</h1>
+                <Heading as="h1" size="large">
+                    Commit history
+                </Heading>
                 <Label variant="secondary">{props.tree}</Label>
                 <Show when={path()}>
                     {(currentPath) => (
@@ -169,10 +185,14 @@ function Commits(props: CommitsProps) {
                             srText={null}
                             aria-hidden="true"
                         />
-                        Loading commits…
+                        <Text as="span" size="small">
+                            Loading commits…
+                        </Text>
                     </div>
                 </Match>
-                <Match when={commitsQuery.isError}>Error loading commits</Match>
+                <Match when={commitsQuery.isError}>
+                    <Text>Error loading commits</Text>
+                </Match>
                 <Match when={commitsQuery.data}>
                     {(history) => (
                         <>
@@ -180,7 +200,9 @@ function Commits(props: CommitsProps) {
                                 when={history().commits.length > 0}
                                 fallback={
                                     <div class="rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] p-6 text-center text-[var(--fgColor-muted)]">
-                                        No commits found.
+                                        <Text as="p" size="small">
+                                            No commits found.
+                                        </Text>
                                     </div>
                                 }
                             >
@@ -195,9 +217,7 @@ function Commits(props: CommitsProps) {
 
                             <Pagination
                                 currentPage={page()}
-                                pageCount={
-                                    page() + (history().hasNext ? 1 : 0)
-                                }
+                                pageCount={page() + (history().hasNext ? 1 : 0)}
                                 hrefBuilder={(nextPage) =>
                                     commitPageHref(props, nextPage)
                                 }

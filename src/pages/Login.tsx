@@ -1,4 +1,12 @@
-import { Button, TextInput } from "@primer/solid";
+import {
+    Box,
+    Button,
+    Heading,
+    Link,
+    Stack,
+    Text,
+    TextInput,
+} from "@primer/solid";
 import { useNavigate } from "@solidjs/router";
 import { createSignal } from "solid-js";
 
@@ -20,12 +28,34 @@ function Login() {
     };
 
     return (
-        <main class="grid min-h-screen place-items-center overflow-hidden px-4">
-            <form
+        <Box
+            as="main"
+            sx={{
+                display: "grid",
+                "min-height": "100vh",
+                "place-items": "center",
+                overflow: "hidden",
+                "padding-inline": "1rem",
+            }}
+        >
+            <Stack
+                as="form"
                 onSubmit={handleSubmit}
-                class="flex w-full max-w-md flex-col gap-3 rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] p-6 shadow-sm"
+                gap="cozy"
+                sx={{
+                    width: "100%",
+                    "max-width": "28rem",
+                    padding: "1.5rem",
+                    border: "1px solid var(--borderColor-default)",
+                    "border-radius": "0.375rem",
+                    "background-color": "var(--bgColor-default)",
+                    "box-shadow":
+                        "var(--shadow-resting-small, 0 1px 3px rgba(31, 35, 40, 0.12))",
+                }}
             >
-                <h1 class="text-xl font-semibold">Sign in with a token</h1>
+                <Heading as="h1" size="medium">
+                    Sign in with a token
+                </Heading>
                 <TextInput
                     type="password"
                     value={token()}
@@ -37,18 +67,19 @@ function Login() {
                 <Button variant="primary" type="submit">
                     Login
                 </Button>
-                <p class="text-sm text-[var(--fgColor-muted)]">
+                <Text
+                    as="p"
+                    size="small"
+                    style={{ color: "var(--fgColor-muted)" }}
+                >
                     Create a personal auth token (
-                    <a
-                        class="text-[var(--fgColor-accent)] hover:underline"
-                        href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token"
-                    >
+                    <Link href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token">
                         Docs
-                    </a>
+                    </Link>
                     )
-                </p>
-            </form>
-        </main>
+                </Text>
+            </Stack>
+        </Box>
     );
 }
 

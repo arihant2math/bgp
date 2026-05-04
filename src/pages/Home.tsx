@@ -1,7 +1,8 @@
+import { Heading, Link, Stack, Text } from "@primer/solid";
 import { useQuery } from "@tanstack/solid-query";
-import { getOctokit, parseRestOctokitResponse } from "../lib/octokit.ts";
 import { Match, Switch } from "solid-js";
 import { profileHref, repoHref } from "../lib/hrefGen.ts";
+import { getOctokit, parseRestOctokitResponse } from "../lib/octokit.ts";
 
 function Home() {
     const query = useQuery(() => ({
@@ -13,23 +14,34 @@ function Home() {
     }));
 
     return (
-        <main class="flex-col mx-auto">
+        <main>
             <Switch>
-                <Match when={query.isPending}>Loading...</Match>
-                <Match when={query.isError}>Error</Match>
+                <Match when={query.isPending}>
+                    <Text>Loading...</Text>
+                </Match>
+                <Match when={query.isError}>
+                    <Text>Error</Text>
+                </Match>
                 <Match when={query.isSuccess}>
-                    <div class="flex flex-col items-center gap-2">
-                        <h1 class="text-2xl">Hi {query.data.name}!</h1>
-                        <span>
+                    <Stack
+                        align="center"
+                        gap="condensed"
+                        sx={{ margin: "0 auto" }}
+                    >
+                        <Heading as="h1" size="large">
+                            Hi {query.data.name}!
+                        </Heading>
+                        <Text as="p">
                             Your Profile:{" "}
-                            <a href={profileHref(query.data.login)}>
+                            <Link href={profileHref(query.data.login)}>
                                 {query.data.login}
-                            </a>
-                        </span>
-                        <span>
-                            Demo: <a href={repoHref("servo", "servo")}>Servo</a>
-                        </span>
-                    </div>
+                            </Link>
+                        </Text>
+                        <Text as="p">
+                            Demo:{" "}
+                            <Link href={repoHref("servo", "servo")}>Servo</Link>
+                        </Text>
+                    </Stack>
                 </Match>
             </Switch>
         </main>
