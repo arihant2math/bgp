@@ -108,18 +108,30 @@ function RepositoryItem(props: RepositoryItemProps) {
                                 <li class="flex min-w-0 items-center gap-2">
                                     <span aria-hidden="true">/</span>
                                     <Switch>
-                                        <Match when={index() === props.path.length - 1}>
+                                        <Match
+                                            when={
+                                                index() ===
+                                                props.path.length - 1
+                                            }
+                                        >
                                             <span class="text-[var(--fgColor-default)]">
                                                 {segment}
                                             </span>
                                         </Match>
-                                        <Match when={index() < props.path.length - 1}>
+                                        <Match
+                                            when={
+                                                index() < props.path.length - 1
+                                            }
+                                        >
                                             <a
                                                 href={repoTreeHref(
                                                     props.profile,
                                                     props.repo,
                                                     props.tree,
-                                                    props.path.slice(0, index() + 1),
+                                                    props.path.slice(
+                                                        0,
+                                                        index() + 1,
+                                                    ),
                                                 )}
                                                 class="text-[var(--fgColor-accent)] hover:underline"
                                             >
@@ -175,6 +187,8 @@ function RepositoryItem(props: RepositoryItemProps) {
                                         )}
                                         path={readmeQuery.data.path}
                                         markdownContext={`${props.profile}/${props.repo}`}
+                                        rawUrl={readmeQuery.data.download_url}
+                                        htmlUrl={readmeQuery.data.html_url}
                                         class="mt-4"
                                     />
                                 </Show>
@@ -187,6 +201,8 @@ function RepositoryItem(props: RepositoryItemProps) {
                                 )}
                                 path={contentsQuery.data.path}
                                 markdownContext={`${props.profile}/${props.repo}`}
+                                rawUrl={contentsQuery.data.download_url}
+                                htmlUrl={contentsQuery.data.html_url}
                             />
                         </Match>
                     </Switch>

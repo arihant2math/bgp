@@ -7,6 +7,7 @@ export type CodeRendererProps = {
     language?: string;
     path?: string;
     theme?: BundledTheme;
+    framed?: boolean;
     class?: string;
 };
 
@@ -117,10 +118,11 @@ function CodeRenderer(props: CodeRendererProps) {
         ([code, language, path, theme]) =>
             renderCode(code, language, path, theme),
     );
+    const framed = () => props.framed ?? true;
 
     return (
         <div
-            class={`code-renderer overflow-hidden rounded-md border border-base-300 bg-base-100 ${props.class ?? ""}`}
+            class={`code-renderer overflow-hidden ${framed() ? "rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)]" : "bg-[var(--bgColor-default)]"} ${props.class ?? ""}`}
         >
             <Show
                 when={html()}

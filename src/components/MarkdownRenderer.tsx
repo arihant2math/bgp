@@ -6,6 +6,7 @@ import { getOctokit } from "../lib/octokit.ts";
 export type MarkdownRendererProps = {
     markdown: string;
     context?: `${string}/${string}`;
+    framed?: boolean;
     class?: string;
 };
 
@@ -31,10 +32,11 @@ function MarkdownRenderer(props: MarkdownRendererProps) {
         queryKey: ["markdown", props.markdown, props.context],
         queryFn: () => renderMarkdown(props.markdown, props.context),
     }));
+    const framed = () => props.framed ?? true;
 
     return (
         <div
-            class={`markdown-renderer rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] ${props.class ?? ""}`}
+            class={`markdown-renderer ${framed() ? "rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)]" : "bg-[var(--bgColor-default)]"} ${props.class ?? ""}`}
         >
             <Switch>
                 <Match when={htmlQuery.isPending}>

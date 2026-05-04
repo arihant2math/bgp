@@ -243,6 +243,8 @@ function Repository(props: RepositoryProps) {
                                         )}
                                         path={readmeQuery.data.path}
                                         markdownContext={`${props.profile}/${props.repo}`}
+                                        rawUrl={readmeQuery.data.download_url}
+                                        htmlUrl={readmeQuery.data.html_url}
                                         class="mt-4"
                                     />
                                 </Show>
