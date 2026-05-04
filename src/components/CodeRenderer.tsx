@@ -33,7 +33,10 @@ const filenameLanguages: Record<string, string> = {
 };
 
 const extensionLanguages: Record<string, string> = {
+    c: "c",
     cjs: "js",
+    cpp: "cpp",
+    go: "go",
     h: "c",
     hpp: "cpp",
     htm: "html",
@@ -43,6 +46,8 @@ const extensionLanguages: Record<string, string> = {
     py: "python",
     rb: "ruby",
     rs: "rust",
+    sql: "sql",
+    toml: "toml",
     ts: "typescript",
     tsx: "tsx",
     yml: "yaml",
