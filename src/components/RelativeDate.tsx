@@ -5,6 +5,8 @@ export type RelativeDateProps = {
     datetime: string;
     class?: string;
     fallback?: string;
+    threshold?: string;
+    prefix?: string;
 };
 
 function isValidDate(value: string) {
@@ -24,6 +26,8 @@ function RelativeDate(props: RelativeDateProps) {
             <RelativeTime
                 datetime={props.datetime}
                 format="relative"
+                threshold={props.threshold}
+                prefix={props.prefix}
                 class={props.class}
             />
         </Show>
