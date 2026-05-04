@@ -15,7 +15,6 @@ import { Octicon } from "@primer/solid/octicon";
 import { useSearchParams } from "@solidjs/router";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo, type JSX } from "solid-js";
-import { format } from "timeago.js";
 import type {
     IssueReasonFilter,
     PullDraftFilter,
@@ -38,6 +37,7 @@ import {
 } from "../lib/githubWorkItems.ts";
 import { repoHref } from "../lib/hrefGen.ts";
 import Avatar from "./Avatar.tsx";
+import RelativeDate from "./RelativeDate.tsx";
 import RepoPageLayout from "./RepoPageLayout.tsx";
 
 export type RepoWorkItemsPageProps = {
@@ -127,21 +127,6 @@ function pageHref(
 
 function formatCount(count: number) {
     return new Intl.NumberFormat().format(count);
-}
-
-function isValidDate(value: string) {
-    return !Number.isNaN(new Date(value).getTime());
-}
-
-function formatDate(value: string) {
-    const date = new Date(value);
-    return Number.isNaN(date.getTime())
-        ? "Unknown date"
-        : date.toLocaleString();
-}
-
-function relativeTime(value: string) {
-    return isValidDate(value) ? format(value) : "unknown date";
 }
 
 function getErrorMessage(error: unknown) {
@@ -352,12 +337,7 @@ function WorkItemRow(props: { item: WorkItem; kind: WorkItemKind }) {
                             </>
                         )}
                     </Show>
-                    <time
-                        dateTime={props.item.created_at}
-                        title={formatDate(props.item.created_at)}
-                    >
-                        {relativeTime(props.item.created_at)}
-                    </time>
+                    <RelativeDate datetime={props.item.created_at} />
                     <Show when={props.item.milestone?.title}>
                         {(title) => (
                             <>

@@ -1,9 +1,9 @@
 import { Octicon } from "@primer/solid/octicon";
 import { createMemo, For, Show } from "solid-js";
-import { format } from "timeago.js";
 import type { CommitSummary } from "../lib/githubCommits.ts";
 import { repoTreeHref } from "../lib/hrefGen.ts";
 import CommitListItem from "./CommitListItem.tsx";
+import RelativeDate from "./RelativeDate.tsx";
 
 const commitCountFormatter = new Intl.NumberFormat();
 
@@ -109,16 +109,11 @@ function FileList(props: FileListProps) {
                                         fallback={<span>—</span>}
                                     >
                                         {(commit) => (
-                                            <time
-                                                dateTime={
+                                            <RelativeDate
+                                                datetime={
                                                     commit().committedDate
                                                 }
-                                                title={new Date(
-                                                    commit().committedDate,
-                                                ).toLocaleString()}
-                                            >
-                                                {format(commit().committedDate)}
-                                            </time>
+                                            />
                                         )}
                                     </Show>
                                 </Show>

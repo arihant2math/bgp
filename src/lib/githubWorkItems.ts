@@ -349,3 +349,65 @@ export async function fetchWorkItems(args: {
         query,
     };
 }
+
+export async function fetchRepoLabels(args: {
+    owner: string;
+    repo: string;
+}): Promise<WorkItemLabel[]> {
+    const octokit = getOctokit();
+    const labels = await octokit.paginate(octokit.rest.issues.listLabelsForRepo, {
+        owner: args.owner,
+        repo: args.repo,
+        per_page: 100,
+    });
+
+    return labels
+        .map((label) => ({
+            id: label.id,
+            name: label.name,
+            color: label.color,
+            description: label.description,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function fetchRepoMilestones(args: {
+    owner: string;
+    repo: string;
+}): Promise<WorkItemMilestone[]> {
+    const octokit = getOctokit();
+    const milestones = await octokit.paginate(octokit.rest.issues.listMilestones, {
+        owner: args.owner,
+        repo: args.repo,
+        state: "all",
+        per_page: 100,
+    });
+
+    return milestones
+        .map((milestone) => ({
+            number: milestone.number,
+            title: milestone.title,
+            state: milestone.state,
+        }))
+        .sort((a, b) => a.title.localeCompare(b.title));
+}
+
+export async function fetchRepoAssignees(args: {
+    owner: string;
+    repo: string;
+}): Promise<WorkItemUser[]> {
+    const octokit = getOctokit();
+    const assignees = await octokit.paginate(octokit.rest.issues.listAssignees, {
+        owner: args.owner,
+        repo: args.repo,
+        per_page: 100,
+    });
+
+    return assignees
+        .map((user) => ({
+            login: user.login,
+            avatar_url: user.avatar_url,
+            html_url: user.html_url,
+        }))
+        .sort((a, b) => a.login.localeCompare(b.login));
+}

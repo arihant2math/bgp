@@ -1,9 +1,9 @@
 import { Button, Spinner } from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
 import { createMemo, createSignal, For, Show } from "solid-js";
-import { format } from "timeago.js";
 import type { CommitAuthor, CommitSummary } from "../lib/githubCommits.ts";
 import Avatar from "./Avatar.tsx";
+import RelativeDate from "./RelativeDate.tsx";
 
 export type CommitListItemProps = {
     commit?: CommitSummary | null;
@@ -179,14 +179,7 @@ function CommitBody(props: CommitListItemProps & { commit: CommitSummary }) {
                         )}
                     </Show>
                     <span aria-hidden="true">·</span>
-                    <time
-                        dateTime={props.commit.committedDate}
-                        title={new Date(
-                            props.commit.committedDate,
-                        ).toLocaleString()}
-                    >
-                        {format(props.commit.committedDate)}
-                    </time>
+                    <RelativeDate datetime={props.commit.committedDate} />
                 </div>
                 <HistoryButton
                     label={props.historyLabel}
