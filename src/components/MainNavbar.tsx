@@ -53,8 +53,8 @@ const MainNavbar: Component<MainNavbarProps> = (props) => {
     });
 
     return (
-        <nav class="border-b border-[var(--borderColor-default)] bg-[var(--bgColor-default)]">
-            <div class="mx-auto flex min-h-14 max-w-6xl items-center gap-4 px-4">
+        <nav class="border-[var(--borderColor-default)] bg-[var(--bgColor-default)]">
+            <div class="mx-auto flex min-h-14 items-center gap-4 px-4">
                 <div class="flex min-w-0 flex-1 items-center gap-2">
                     <a href={appHref("/")} aria-label="Home">
                         <Octicon
