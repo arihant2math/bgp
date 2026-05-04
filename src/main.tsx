@@ -1,5 +1,6 @@
 import { render } from "solid-js/web";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import { ThemeProvider } from "@primer/solid";
 import "@primer/solid/styles.css";
 import "./styles.css";
 import App from "./App";
@@ -14,7 +15,9 @@ if (!root) {
 render(
     () => (
         <QueryClientProvider client={queryClient}>
-            <App />
+            <ThemeProvider colorMode="auto" style={{ "min-height": "100vh" }}>
+                <App />
+            </ThemeProvider>
         </QueryClientProvider>
     ),
     root,

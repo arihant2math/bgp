@@ -42,24 +42,13 @@ pre.shiki code > span.line::before {
         "SFMono-Regular", "Cascadia Code", "Liberation Mono", monospace;
 }
 
-[data-theme="dark"] .code-renderer .shiki,
-[data-theme="dark"] .code-renderer .shiki span {
+[data-color-scheme*="dark"] .code-renderer .shiki,
+[data-color-scheme*="dark"] .code-renderer .shiki span {
     color: var(--shiki-dark) !important;
 }
 
-[data-theme="dark"] .code-renderer .shiki {
+[data-color-scheme*="dark"] .code-renderer .shiki {
     background-color: var(--shiki-dark-bg) !important;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme]) .code-renderer .shiki,
-    :root:not([data-theme]) .code-renderer .shiki span {
-        color: var(--shiki-dark) !important;
-    }
-
-    :root:not([data-theme]) .code-renderer .shiki {
-        background-color: var(--shiki-dark-bg) !important;
-    }
 }
 
 .markdown-renderer {
