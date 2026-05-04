@@ -89,53 +89,49 @@ function RepositoryItem(props: RepositoryItemProps) {
                     path={props.path}
                     compact
                 />
-                <div class="breadcrumbs text-sm">
-                    <ul>
-                        <li>
+                <nav class="min-w-0 flex-1" aria-label="Breadcrumbs">
+                    <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[var(--fgColor-muted)]">
+                        <li class="min-w-0">
                             <a
                                 href={repoTreeHref(
                                     props.profile,
                                     props.repo,
                                     props.tree,
                                 )}
+                                class="text-[var(--fgColor-accent)] hover:underline"
                             >
                                 {props.repo}
                             </a>
                         </li>
                         <For each={props.path}>
                             {(segment, index) => (
-                                <Switch>
-                                    <Match
-                                        when={index() === props.path.length - 1}
-                                    >
-                                        <li>{segment}</li>
-                                    </Match>
-                                    <Match
-                                        when={
-                                            index() < props.path.length - 1
-                                        }
-                                    >
-                                        <li>
+                                <li class="flex min-w-0 items-center gap-2">
+                                    <span aria-hidden="true">/</span>
+                                    <Switch>
+                                        <Match when={index() === props.path.length - 1}>
+                                            <span class="text-[var(--fgColor-default)]">
+                                                {segment}
+                                            </span>
+                                        </Match>
+                                        <Match when={index() < props.path.length - 1}>
                                             <a
                                                 href={repoTreeHref(
                                                     props.profile,
                                                     props.repo,
                                                     props.tree,
-                                                    props.path.slice(
-                                                        0,
-                                                        index() + 1,
-                                                    ),
+                                                    props.path.slice(0, index() + 1),
                                                 )}
+                                                class="text-[var(--fgColor-accent)] hover:underline"
                                             >
                                                 {segment}
                                             </a>
-                                        </li>
-                                    </Match>
-                                </Switch>
+                                        </Match>
+                                    </Switch>
+                                </li>
                             )}
                         </For>
-                    </ul>
-                </div>
+                    </ol>
+                </nav>
             </div>
             <Switch>
                 <Match when={contentsQuery.isPending}>Loading ...</Match>
