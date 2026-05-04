@@ -1,18 +1,20 @@
-import { useSearchParams } from "@solidjs/router";
-import { Button, ButtonBase } from "@primer/solid";
+import {
+    Button,
+    ButtonBase,
+    Checkbox,
+    CounterLabel,
+    Flash,
+    IssueLabel,
+    Label,
+    Select,
+    Spinner,
+    TextInput,
+} from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
+import { useSearchParams } from "@solidjs/router";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo, type JSX } from "solid-js";
 import { format } from "timeago.js";
-import RepoPageLayout from "./RepoPageLayout.tsx";
-import {
-    SEARCH_RESULT_LIMIT,
-    WORK_ITEMS_PER_PAGE,
-    defaultWorkItemFilters,
-    fetchWorkItems,
-    normalizeWorkItemFilters,
-    workItemFiltersToSearchParams,
-} from "../lib/githubWorkItems.ts";
 import type {
     IssueReasonFilter,
     PullDraftFilter,
@@ -22,10 +24,20 @@ import type {
     WorkItemKind,
     WorkItemLabel,
     WorkItemSort,
-    WorkItemUser,
     WorkItemState,
+    WorkItemUser,
+} from "../lib/githubWorkItems.ts";
+import {
+    SEARCH_RESULT_LIMIT,
+    WORK_ITEMS_PER_PAGE,
+    defaultWorkItemFilters,
+    fetchWorkItems,
+    normalizeWorkItemFilters,
+    workItemFiltersToSearchParams,
 } from "../lib/githubWorkItems.ts";
 import { repoHref } from "../lib/hrefGen.ts";
+import Avatar from "./Avatar.tsx";
+import RepoPageLayout from "./RepoPageLayout.tsx";
 
 export type RepoWorkItemsPageProps = {
     profile: string;
@@ -139,17 +151,12 @@ function getErrorMessage(error: unknown) {
     return `${prefix}${candidate.message ?? "Something went wrong."}`;
 }
 
-function labelTextColor(hex: string | null | undefined) {
-    if (!hex || !/^[0-9a-f]{6}$/i.test(hex)) return "var(--color-base-content)";
-    const red = Number.parseInt(hex.slice(0, 2), 16);
-    const green = Number.parseInt(hex.slice(2, 4), 16);
-    const blue = Number.parseInt(hex.slice(4, 6), 16);
-    const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
-    return luminance > 0.58 ? "#111827" : "#ffffff";
-}
-
-function labelBackground(hex: string | null | undefined) {
-    return hex && /^[0-9a-f]{6}$/i.test(hex) ? `#${hex}` : undefined;
+function labelBackground(
+    hex: string | null | undefined,
+): `#${string}` | undefined {
+    return hex && /^[0-9a-f]{6}$/i.test(hex)
+        ? (`#${hex}` as `#${string}`)
+        : undefined;
 }
 
 function itemIcon(item: WorkItem, kind: WorkItemKind) {
@@ -157,28 +164,40 @@ function itemIcon(item: WorkItem, kind: WorkItemKind) {
         if (item.draft) {
             return {
                 name: "git-pull-request-draft" as const,
-                class: "text-base-content/60",
+                class: "text-[var(--fgColor-muted)]",
             };
         }
         if (item.state === "open") {
-            return { name: "git-pull-request" as const, class: "text-success" };
+            return {
+                name: "git-pull-request" as const,
+                class: "text-[var(--fgColor-success)]",
+            };
         }
         if (item.pull_request?.merged_at) {
-            return { name: "git-merge" as const, class: "text-secondary" };
+            return {
+                name: "git-merge" as const,
+                class: "text-[var(--fgColor-done)]",
+            };
         }
         return {
             name: "git-pull-request-closed" as const,
-            class: "text-error",
+            class: "text-[var(--fgColor-danger)]",
         };
     }
 
     if (item.state === "open") {
-        return { name: "issue-opened" as const, class: "text-success" };
+        return {
+            name: "issue-opened" as const,
+            class: "text-[var(--fgColor-success)]",
+        };
     }
     if (item.state_reason === "not_planned") {
-        return { name: "skip" as const, class: "text-error" };
+        return { name: "skip" as const, class: "text-[var(--fgColor-danger)]" };
     }
-    return { name: "issue-closed" as const, class: "text-secondary" };
+    return {
+        name: "issue-closed" as const,
+        class: "text-[var(--fgColor-done)]",
+    };
 }
 
 function stateLabel(item: WorkItem, kind: WorkItemKind) {
@@ -194,59 +213,68 @@ function stateLabel(item: WorkItem, kind: WorkItemKind) {
     return "Closed";
 }
 
-function stateBadgeClass(item: WorkItem, kind: WorkItemKind) {
-    if (kind === "pulls" && item.pull_request?.merged_at)
-        return "badge-secondary";
-    if (item.state === "open") return "badge-success";
+function stateLabelVariant(item: WorkItem, kind: WorkItemKind) {
+    if (kind === "pulls" && item.pull_request?.merged_at) return "done";
+    if (item.state === "open") return "success";
     if (kind === "issues" && item.state_reason === "not_planned")
-        return "badge-error";
-    if (kind === "pulls" && item.draft) return "badge-ghost";
-    return "badge-neutral";
+        return "danger";
+    if (kind === "pulls" && item.draft) return "default";
+    return "secondary";
+}
+
+function FilterField(props: { label: string; children: JSX.Element }) {
+    return (
+        <label class="flex flex-col gap-2">
+            <span class="text-xs font-semibold uppercase tracking-[0.02em] text-[var(--fgColor-muted)]">
+                {props.label}
+            </span>
+            {props.children}
+        </label>
+    );
+}
+
+function CheckboxRow(props: { name: string; checked: boolean; label: string }) {
+    return (
+        <label class="inline-flex items-center gap-2 text-sm text-[var(--fgColor-default)]">
+            <Checkbox name={props.name} checked={props.checked} />
+            <span>{props.label}</span>
+        </label>
+    );
 }
 
 function WorkItemLabelBadge(props: { label: WorkItemLabel }) {
     const background = () => labelBackground(props.label.color);
 
     return (
-        <span
-            class="badge badge-sm border-0 font-medium"
+        <IssueLabel
+            fillColor={background()}
             title={props.label.description ?? props.label.name}
-            style={{
-                "background-color": background() ?? "var(--color-base-300)",
-                color: background()
-                    ? labelTextColor(props.label.color)
-                    : "var(--color-base-content)",
-            }}
         >
             {props.label.name}
-        </span>
+        </IssueLabel>
     );
 }
 
 function AssigneeAvatar(props: { assignee: WorkItemUser }) {
     return (
-        <div class="avatar" title={props.assignee.login}>
-            <div class="w-6 rounded-full bg-base-300 ring-2 ring-base-100">
-                <Show
-                    when={props.assignee.avatar_url}
-                    fallback={
-                        <div class="grid size-full place-items-center">
-                            <Octicon
-                                name="person"
-                                size={12}
-                                aria-hidden="true"
-                            />
-                        </div>
-                    }
-                >
-                    {(avatarUrl) => (
-                        <img
-                            src={avatarUrl()}
-                            alt={`${props.assignee.login}'s avatar`}
-                        />
-                    )}
-                </Show>
-            </div>
+        <div title={props.assignee.login}>
+            <Show
+                when={props.assignee.avatar_url}
+                fallback={
+                    <div class="grid size-6 place-items-center rounded-full border border-[var(--borderColor-default)] bg-[var(--bgColor-muted)] ring-2 ring-[var(--bgColor-default)]">
+                        <Octicon name="person" size={12} aria-hidden="true" />
+                    </div>
+                }
+            >
+                {(avatarUrl) => (
+                    <Avatar
+                        href={avatarUrl()}
+                        size={24}
+                        alt={`${props.assignee.login}'s avatar`}
+                        class="ring-2 ring-[var(--bgColor-default)]"
+                    />
+                )}
+            </Show>
         </div>
     );
 }
@@ -260,7 +288,7 @@ function WorkItemRow(props: { item: WorkItem; kind: WorkItemKind }) {
         props.item.pull_request?.merged_at;
 
     return (
-        <li class="flex items-start gap-3 border-b border-base-300 px-4 py-4 last:border-b-0 hover:bg-base-200/60">
+        <li class="flex items-start gap-3 border-b border-[var(--borderColor-muted)] px-4 py-4 last:border-b-0 hover:bg-[var(--bgColor-muted)]">
             <div class="pt-1">
                 <Octicon
                     name={icon().name}
@@ -276,29 +304,34 @@ function WorkItemRow(props: { item: WorkItem; kind: WorkItemKind }) {
                         href={props.item.html_url}
                         target="_blank"
                         rel="noreferrer"
-                        class="link-hover min-w-0 text-base font-semibold text-base-content"
+                        class="min-w-0 text-base font-semibold text-[var(--fgColor-default)] hover:text-[var(--fgColor-accent)] hover:underline"
                     >
                         {props.item.title || "Untitled"}
                     </a>
                     <Show when={shouldShowState()}>
-                        <span
-                            class={`badge badge-sm ${stateBadgeClass(props.item, props.kind)}`}
+                        <Label
+                            variant={stateLabelVariant(props.item, props.kind)}
+                            size="small"
                         >
                             {stateLabel(props.item, props.kind)}
-                        </span>
+                        </Label>
                     </Show>
                     <Show when={props.item.locked}>
-                        <span class="badge badge-sm badge-warning gap-1">
+                        <Label
+                            variant="attention"
+                            size="small"
+                            class="inline-flex items-center gap-1"
+                        >
                             <Octicon name="lock" size={12} aria-hidden="true" />
                             Locked
-                        </span>
+                        </Label>
                     </Show>
                     <For each={props.item.labels}>
                         {(label) => <WorkItemLabelBadge label={label} />}
                     </For>
                 </div>
 
-                <div class="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-base-content/70">
+                <div class="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-[var(--fgColor-muted)]">
                     <span>#{props.item.number}</span>
                     <span aria-hidden="true">·</span>
                     <Show when={props.item.user?.login}>
@@ -310,7 +343,7 @@ function WorkItemRow(props: { item: WorkItem; kind: WorkItemKind }) {
                                     }
                                     target="_blank"
                                     rel="noreferrer"
-                                    class="link-hover"
+                                    class="text-[var(--fgColor-accent)] hover:underline"
                                 >
                                     {login()}
                                 </a>
@@ -342,17 +375,8 @@ function WorkItemRow(props: { item: WorkItem; kind: WorkItemKind }) {
                 </div>
             </div>
 
-            <div class="hidden min-w-36 shrink-0 items-center justify-end gap-5 pt-1 text-sm text-base-content/70 md:flex">
-                <Show when={props.kind === "pulls" && props.item.comments > 0}>
-                    <div
-                        class="inline-flex items-center gap-1"
-                        title={`${props.item.comments} comments`}
-                    >
-                        <Octicon name="comment" size={16} aria-hidden="true" />
-                        {formatCount(props.item.comments)}
-                    </div>
-                </Show>
-                <Show when={props.kind === "issues" && props.item.comments > 0}>
+            <div class="hidden min-w-36 shrink-0 items-center justify-end gap-5 pt-1 text-sm text-[var(--fgColor-muted)] md:flex">
+                <Show when={props.item.comments > 0}>
                     <div
                         class="inline-flex items-center gap-1"
                         title={`${props.item.comments} comments`}
@@ -362,17 +386,15 @@ function WorkItemRow(props: { item: WorkItem; kind: WorkItemKind }) {
                     </div>
                 </Show>
                 <Show when={assignees().length > 0}>
-                    <div class="avatar-group -space-x-3 rtl:space-x-reverse">
+                    <div class="flex items-center -space-x-2">
                         <For each={assignees().slice(0, 3)}>
                             {(assignee) => (
                                 <AssigneeAvatar assignee={assignee} />
                             )}
                         </For>
                         <Show when={assignees().length > 3}>
-                            <div class="avatar placeholder">
-                                <div class="w-6 rounded-full bg-base-300 text-[10px]">
-                                    +{assignees().length - 3}
-                                </div>
+                            <div class="grid size-6 place-items-center rounded-full border border-[var(--borderColor-default)] bg-[var(--bgColor-muted)] text-[10px] font-medium ring-2 ring-[var(--bgColor-default)]">
+                                +{assignees().length - 3}
                             </div>
                         </Show>
                     </div>
@@ -386,16 +408,18 @@ function ActiveFilters(props: { chips: FilterChip[]; clearHref: string }) {
     return (
         <Show when={props.chips.length > 0}>
             <div class="flex flex-wrap items-center gap-2">
-                <span class="text-sm text-base-content/70">Filters</span>
+                <span class="text-sm text-[var(--fgColor-muted)]">Filters</span>
                 <For each={props.chips}>
                     {(chip) => (
-                        <a
+                        <Label
+                            as="a"
                             href={chip.href}
-                            class="badge badge-outline gap-1 py-3 hover:bg-base-200"
+                            variant="default"
+                            class="inline-flex items-center gap-1 no-underline hover:opacity-80"
                         >
                             {chip.label}
                             <Octicon name="x" size={12} aria-hidden="true" />
-                        </a>
+                        </Label>
                     )}
                 </For>
                 <Button
@@ -430,29 +454,28 @@ function WorkItemsSearchControls(props: {
 
     return (
         <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
-            <div class="join min-w-0 flex-1">
-                <label class="input input-bordered join-item flex h-9 min-h-9 flex-1 items-center gap-1.5 overflow-hidden rounded-r-none border-base-300 bg-base-100 focus-within:outline-2 focus-within:outline-offset-0 focus-within:outline-primary/40">
-                    <span class="rounded bg-info/15 px-0.5 text-info">
+            <div class="flex min-w-0 flex-1 items-stretch rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] shadow-sm">
+                <div class="flex min-w-0 flex-1 items-center gap-2 px-3">
+                    <Label variant="accent" size="small">
                         {qualifier()}
-                    </span>
-                    <span class="rounded bg-info/15 px-0.5 text-info">
+                    </Label>
+                    <Label variant="accent" size="small">
                         {stateQualifier()}
-                    </span>
+                    </Label>
                     <input
                         name="q"
                         type="search"
-                        class="min-w-24 grow"
+                        class="min-w-24 grow border-0 bg-transparent py-2 text-sm outline-none placeholder:text-[var(--fgColor-muted)]"
                         value={props.filters.q}
                         placeholder={`Search ${itemNoun(props.pageProps.kind)}`}
                         autocomplete="off"
                     />
-                </label>
+                </div>
                 <Button
                     icon={
                         <Octicon name="search" size={18} aria-hidden="true" />
                     }
                     type="submit"
-                    class="join-item"
                     aria-label={`Search ${itemNoun(props.pageProps.kind)}`}
                 />
             </div>
@@ -502,7 +525,7 @@ function WorkItemsSearchControls(props: {
 
 function FilterDropdown(props: { label: string; children: JSX.Element }) {
     return (
-        <details class="dropdown dropdown-end">
+        <details class="relative">
             <ButtonBase
                 as="summary"
                 variant="invisible"
@@ -518,7 +541,7 @@ function FilterDropdown(props: { label: string; children: JSX.Element }) {
             >
                 {props.label}
             </ButtonBase>
-            <div class="menu dropdown-content z-20 mt-2 w-72 rounded-box border border-base-300 bg-base-100 p-4 shadow-xl">
+            <div class="absolute right-0 z-20 mt-2 w-72 rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] p-4 shadow-lg">
                 {props.children}
                 <div class="mt-4 flex justify-end gap-2">
                     <Button type="submit" variant="primary" size="small">
@@ -532,14 +555,18 @@ function FilterDropdown(props: { label: string; children: JSX.Element }) {
 
 function CountPill(props: { count?: number; pending: boolean }) {
     return (
-        <span class="rounded-full bg-base-300/70 px-2 py-0.5 text-sm font-semibold text-base-content">
-            <Show
-                when={!props.pending}
-                fallback={<span class="loading loading-spinner loading-xs" />}
-            >
+        <Show
+            when={!props.pending}
+            fallback={
+                <span class="inline-flex min-h-5 min-w-5 items-center justify-center">
+                    <Spinner size="small" srText={null} aria-hidden="true" />
+                </span>
+            }
+        >
+            <CounterLabel variant="secondary">
                 {formatCount(props.count ?? 0)}
-            </Show>
-        </span>
+            </CounterLabel>
+        </Show>
     );
 }
 
@@ -556,11 +583,11 @@ function WorkItemsToolbar(props: {
 }) {
     const activeStateClass = (state: WorkItemState) =>
         props.filters.state === state
-            ? "font-semibold text-base-content"
-            : "font-medium text-base-content/70 hover:text-base-content";
+            ? "font-semibold text-[var(--fgColor-default)]"
+            : "font-medium text-[var(--fgColor-muted)] hover:text-[var(--fgColor-default)]";
 
     return (
-        <div class="flex flex-col gap-3 border-b border-base-300 bg-base-200/60 px-4 py-3 lg:flex-row lg:items-center">
+        <div class="flex flex-col gap-3 border-b border-[var(--borderColor-muted)] bg-[var(--bgColor-muted)] px-4 py-3 lg:flex-row lg:items-center">
             <input type="hidden" name="state" value={props.filters.state} />
             <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <a
@@ -574,7 +601,7 @@ function WorkItemsToolbar(props: {
                                 : "git-pull-request"
                         }
                         size={16}
-                        class="text-success"
+                        class="text-[var(--fgColor-success)]"
                         aria-hidden="true"
                     />
                     Open
@@ -594,7 +621,7 @@ function WorkItemsToolbar(props: {
                                 : "git-pull-request-closed"
                         }
                         size={16}
-                        class="text-base-content/50"
+                        class="text-[var(--fgColor-muted)]"
                         aria-hidden="true"
                     />
                     Closed
@@ -604,117 +631,104 @@ function WorkItemsToolbar(props: {
                     />
                 </a>
                 <Show when={props.filters.state === "all"}>
-                    <span class="badge badge-outline">Viewing all</span>
+                    <Label variant="default" size="small">
+                        Viewing all
+                    </Label>
                 </Show>
             </div>
 
             <div class="flex flex-wrap items-center gap-1 lg:ml-auto">
                 <FilterDropdown label="Author">
-                    <fieldset class="fieldset p-0">
-                        <legend class="fieldset-legend">
-                            Filter by author
-                        </legend>
-                        <input
+                    <FilterField label="Filter by author">
+                        <TextInput
                             name="author"
-                            class="input input-bordered input-sm w-full"
+                            size="small"
+                            block
                             value={props.filters.author}
                             placeholder="octocat"
                             autocomplete="off"
                         />
-                    </fieldset>
+                    </FilterField>
                 </FilterDropdown>
 
                 <FilterDropdown label="Labels">
-                    <fieldset class="fieldset p-0">
-                        <legend class="fieldset-legend">
-                            Filter by labels
-                        </legend>
-                        <input
-                            name="labels"
-                            class="input input-bordered input-sm w-full"
-                            value={props.filters.labels.join(", ")}
-                            placeholder="bug, help wanted"
-                            disabled={props.filters.noLabels}
-                        />
-                        <label class="label cursor-pointer justify-start gap-2">
-                            <input
-                                type="checkbox"
-                                name="noLabels"
-                                class="checkbox checkbox-sm"
-                                checked={props.filters.noLabels}
+                    <div class="space-y-3">
+                        <FilterField label="Filter by labels">
+                            <TextInput
+                                name="labels"
+                                size="small"
+                                block
+                                value={props.filters.labels.join(", ")}
+                                placeholder="bug, help wanted"
+                                disabled={props.filters.noLabels}
                             />
-                            <span class="label-text">Unlabeled only</span>
-                        </label>
-                    </fieldset>
+                        </FilterField>
+                        <CheckboxRow
+                            name="noLabels"
+                            checked={props.filters.noLabels}
+                            label="Unlabeled only"
+                        />
+                    </div>
                 </FilterDropdown>
 
                 <FilterDropdown label="Projects">
-                    <p class="text-sm text-base-content/70">
+                    <p class="text-sm text-[var(--fgColor-muted)]">
                         Project filters are not available through GitHub issue
                         search. Use labels, milestones, and assignees instead.
                     </p>
                 </FilterDropdown>
 
                 <FilterDropdown label="Milestones">
-                    <fieldset class="fieldset p-0">
-                        <legend class="fieldset-legend">
-                            Filter by milestone
-                        </legend>
-                        <input
-                            name="milestone"
-                            class="input input-bordered input-sm w-full"
-                            value={props.filters.milestone}
-                            placeholder="v1.0"
-                            disabled={props.filters.noMilestone}
-                        />
-                        <label class="label cursor-pointer justify-start gap-2">
-                            <input
-                                type="checkbox"
-                                name="noMilestone"
-                                class="checkbox checkbox-sm"
-                                checked={props.filters.noMilestone}
+                    <div class="space-y-3">
+                        <FilterField label="Filter by milestone">
+                            <TextInput
+                                name="milestone"
+                                size="small"
+                                block
+                                value={props.filters.milestone}
+                                placeholder="v1.0"
+                                autocomplete="off"
+                                disabled={props.filters.noMilestone}
                             />
-                            <span class="label-text">No milestone</span>
-                        </label>
-                    </fieldset>
+                        </FilterField>
+                        <CheckboxRow
+                            name="noMilestone"
+                            checked={props.filters.noMilestone}
+                            label="No milestone"
+                        />
+                    </div>
                 </FilterDropdown>
 
                 <FilterDropdown label="Assignees">
-                    <fieldset class="fieldset p-0">
-                        <legend class="fieldset-legend">
-                            Filter by assignee
-                        </legend>
-                        <input
-                            name="assignee"
-                            class="input input-bordered input-sm w-full"
-                            value={props.filters.assignee}
-                            placeholder="octocat"
-                            autocomplete="off"
-                            disabled={props.filters.unassigned}
-                        />
-                        <label class="label cursor-pointer justify-start gap-2">
-                            <input
-                                type="checkbox"
-                                name="unassigned"
-                                class="checkbox checkbox-sm"
-                                checked={props.filters.unassigned}
+                    <div class="space-y-3">
+                        <FilterField label="Filter by assignee">
+                            <TextInput
+                                name="assignee"
+                                size="small"
+                                block
+                                value={props.filters.assignee}
+                                placeholder="octocat"
+                                autocomplete="off"
+                                disabled={props.filters.unassigned}
                             />
-                            <span class="label-text">Unassigned only</span>
-                        </label>
-                    </fieldset>
+                        </FilterField>
+                        <CheckboxRow
+                            name="unassigned"
+                            checked={props.filters.unassigned}
+                            label="Unassigned only"
+                        />
+                    </div>
                 </FilterDropdown>
 
                 <FilterDropdown label="Types">
                     <Show
                         when={props.pageProps.kind === "pulls"}
                         fallback={
-                            <fieldset class="fieldset p-0">
-                                <legend class="fieldset-legend">
-                                    Closed issue reason
-                                </legend>
-                                <select
+                            <FilterField label="Closed issue reason">
+                                <Select
                                     name="reason"
-                                    class="select select-bordered select-sm w-full"
+                                    size="small"
+                                    block
                                     value={props.filters.reason}
                                 >
                                     <For each={REASON_OPTIONS}>
@@ -724,41 +738,44 @@ function WorkItemsToolbar(props: {
                                             </option>
                                         )}
                                     </For>
-                                </select>
-                            </fieldset>
+                                </Select>
+                            </FilterField>
                         }
                     >
-                        <fieldset class="fieldset p-0">
-                            <legend class="fieldset-legend">
-                                Pull request status
-                            </legend>
-                            <select
-                                name="draft"
-                                class="select select-bordered select-sm w-full"
-                                value={props.filters.draft}
-                            >
-                                <For each={DRAFT_OPTIONS}>
-                                    {(option) => (
-                                        <option value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    )}
-                                </For>
-                            </select>
-                            <select
-                                name="review"
-                                class="select select-bordered select-sm w-full"
-                                value={props.filters.review}
-                            >
-                                <For each={REVIEW_OPTIONS}>
-                                    {(option) => (
-                                        <option value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    )}
-                                </For>
-                            </select>
-                        </fieldset>
+                        <div class="space-y-3">
+                            <FilterField label="Pull request status">
+                                <Select
+                                    name="draft"
+                                    size="small"
+                                    block
+                                    value={props.filters.draft}
+                                >
+                                    <For each={DRAFT_OPTIONS}>
+                                        {(option) => (
+                                            <option value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        )}
+                                    </For>
+                                </Select>
+                            </FilterField>
+                            <FilterField label="Review state">
+                                <Select
+                                    name="review"
+                                    size="small"
+                                    block
+                                    value={props.filters.review}
+                                >
+                                    <For each={REVIEW_OPTIONS}>
+                                        {(option) => (
+                                            <option value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        )}
+                                    </For>
+                                </Select>
+                            </FilterField>
+                        </div>
                     </Show>
                 </FilterDropdown>
 
@@ -769,11 +786,11 @@ function WorkItemsToolbar(props: {
                         )?.label ?? "Newest"
                     }
                 >
-                    <fieldset class="fieldset p-0">
-                        <legend class="fieldset-legend">Sort by</legend>
-                        <select
+                    <FilterField label="Sort by">
+                        <Select
                             name="sort"
-                            class="select select-bordered select-sm w-full"
+                            size="small"
+                            block
                             value={props.filters.sort}
                         >
                             <For each={SORT_OPTIONS}>
@@ -783,8 +800,8 @@ function WorkItemsToolbar(props: {
                                     </option>
                                 )}
                             </For>
-                        </select>
-                    </fieldset>
+                        </Select>
+                    </FilterField>
                 </FilterDropdown>
 
                 <Button
@@ -895,7 +912,7 @@ function EmptyWorkItems(props: {
     return (
         <div class="grid min-h-64 place-items-center p-8 text-center">
             <div class="max-w-md">
-                <div class="mx-auto grid size-14 place-items-center rounded-full bg-base-200">
+                <div class="mx-auto grid size-14 place-items-center rounded-full bg-[var(--bgColor-muted)]">
                     <Octicon name="search" size={24} aria-hidden="true" />
                 </div>
                 <h2 class="mt-4 text-lg font-semibold">
@@ -908,7 +925,7 @@ function EmptyWorkItems(props: {
                         No results on this page
                     </Show>
                 </h2>
-                <p class="mt-1 text-sm opacity-70">
+                <p class="mt-1 text-sm text-[var(--fgColor-muted)]">
                     <Show
                         when={isEmptyPage()}
                         fallback={
@@ -1082,7 +1099,7 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
 
                     <ActiveFilters chips={chips()} clearHref={clearHref()} />
 
-                    <div class="overflow-visible rounded-box border border-base-300 bg-base-100 shadow-sm">
+                    <div class="overflow-visible rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] shadow-sm">
                         <WorkItemsToolbar
                             pageProps={props}
                             filters={filters()}
@@ -1103,7 +1120,7 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                             <Match when={workItemsQuery.isPending}>
                                 <div class="grid min-h-64 place-items-center p-8 text-center">
                                     <div>
-                                        <span class="loading loading-spinner loading-lg text-primary" />
+                                        <Spinner size="large" />
                                         <p class="mt-3 font-medium">
                                             Loading {itemNoun(props.kind)}…
                                         </p>
@@ -1112,9 +1129,9 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                             </Match>
                             <Match when={workItemsQuery.isError}>
                                 <div class="p-4">
-                                    <div
-                                        role="alert"
-                                        class="alert alert-error items-start"
+                                    <Flash
+                                        variant="danger"
+                                        class="flex items-start gap-3"
                                     >
                                         <Octicon
                                             name="alert"
@@ -1132,7 +1149,7 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                                                 )}
                                             </p>
                                         </div>
-                                    </div>
+                                    </Flash>
                                 </div>
                             </Match>
                             <Match when={workItemsQuery.data}>
@@ -1140,9 +1157,9 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                                     <>
                                         <Show when={result().incompleteResults}>
                                             <div class="p-4 pb-0">
-                                                <div
-                                                    role="alert"
-                                                    class="alert alert-warning"
+                                                <Flash
+                                                    variant="warning"
+                                                    class="flex items-center gap-2"
                                                 >
                                                     <Octicon
                                                         name="alert"
@@ -1154,7 +1171,7 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                                                         results. Try narrowing
                                                         your filters.
                                                     </span>
-                                                </div>
+                                                </Flash>
                                             </div>
                                         </Show>
 
@@ -1171,7 +1188,7 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                                                 />
                                             }
                                         >
-                                            <ul class="bg-base-100">
+                                            <ul>
                                                 <For each={result().items}>
                                                     {(item) => (
                                                         <WorkItemRow
@@ -1190,7 +1207,7 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                 </form>
 
                 <div class="flex flex-col items-center justify-between gap-3 sm:flex-row">
-                    <p class="text-sm text-base-content/70">
+                    <p class="text-sm text-[var(--fgColor-muted)]">
                         <Show when={workItemsQuery.data}>
                             {(result) => (
                                 <>
@@ -1213,20 +1230,22 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                                             !workItemsQuery.isPending
                                         }
                                     >
-                                        <span class="ml-2 loading loading-spinner loading-xs" />
+                                        <span class="ml-2 inline-flex align-middle">
+                                            <Spinner
+                                                size="small"
+                                                srText={null}
+                                                aria-hidden="true"
+                                            />
+                                        </span>
                                     </Show>
                                 </>
                             )}
                         </Show>
                     </p>
-                    <div class="join">
+                    <div class="flex items-center gap-2">
                         <Show
                             when={hasPrevious()}
-                            fallback={
-                                <Button class="join-item" disabled>
-                                    Previous
-                                </Button>
-                            }
+                            fallback={<Button disabled>Previous</Button>}
                         >
                             <Button
                                 as="a"
@@ -1235,21 +1254,14 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                                     filters(),
                                     filters().page - 1,
                                 )}
-                                class="join-item"
                             >
                                 Previous
                             </Button>
                         </Show>
-                        <Button class="join-item" variant="invisible" disabled>
-                            Page {filters().page}
-                        </Button>
+                        <Label variant="secondary">Page {filters().page}</Label>
                         <Show
                             when={hasNext()}
-                            fallback={
-                                <Button class="join-item" disabled>
-                                    Next
-                                </Button>
-                            }
+                            fallback={<Button disabled>Next</Button>}
                         >
                             <Button
                                 as="a"
@@ -1258,7 +1270,6 @@ function RepoWorkItemsPage(props: RepoWorkItemsPageProps) {
                                     filters(),
                                     filters().page + 1,
                                 )}
-                                class="join-item"
                             >
                                 Next
                             </Button>

@@ -1,3 +1,4 @@
+import { Spinner } from "@primer/solid";
 import { useQuery } from "@tanstack/solid-query";
 import { Match, Switch } from "solid-js";
 import { getOctokit } from "../lib/octokit.ts";
@@ -33,20 +34,21 @@ function MarkdownRenderer(props: MarkdownRendererProps) {
 
     return (
         <div
-            class={`markdown-renderer rounded-md border border-base-300 bg-base-100 ${props.class ?? ""}`}
+            class={`markdown-renderer rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] ${props.class ?? ""}`}
         >
             <Switch>
                 <Match when={htmlQuery.isPending}>
-                    <div class="flex items-center gap-3 p-4 text-sm text-base-content/70">
-                        <span
-                            class="loading loading-spinner loading-sm"
+                    <div class="flex items-center gap-3 p-4 text-sm text-[var(--fgColor-muted)]">
+                        <Spinner
+                            size="small"
+                            srText={null}
                             aria-hidden="true"
                         />
                         Rendering markdown…
                     </div>
                 </Match>
                 <Match when={htmlQuery.isError}>
-                    <div class="p-4 text-sm text-error">
+                    <div class="p-4 text-sm text-[var(--fgColor-danger)]">
                         Could not render markdown from GitHub.
                     </div>
                 </Match>

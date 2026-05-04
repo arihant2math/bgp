@@ -1,7 +1,7 @@
-import type { Component } from "solid-js";
-import { Show } from "solid-js";
-import approx from "approximate-number";
+import { Label } from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
+import approx from "approximate-number";
+import { Show, type Component } from "solid-js";
 import { repoHref } from "../lib/hrefGen.ts";
 
 export type RepoCardProps = {
@@ -21,7 +21,7 @@ const RepoCard: Component<RepoCardProps> = (props) => {
     const visibility = () => props.visibility ?? "public";
 
     return (
-        <article class="rounded-md border border-base-content/50 bg-base-100 p-4 min-h-35 flex flex-col justify-between">
+        <article class="flex min-h-35 flex-col justify-between rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] p-4">
             <div>
                 <div class="flex items-center gap-3">
                     <Octicon
@@ -32,16 +32,16 @@ const RepoCard: Component<RepoCardProps> = (props) => {
                     />
                     <a
                         href={href()}
-                        class="font-semibold text-md link link-hover leading-tight"
+                        class="text-md leading-tight font-semibold text-[var(--fgColor-accent)] hover:underline"
                     >
                         {props.owner}/{props.name}
                     </a>
-                    <span class="badge badge-outline badge-sm rounded-full capitalize font-semibold">
+                    <Label variant="secondary" size="small">
                         {visibility()}
-                    </span>
+                    </Label>
                 </div>
                 <Show when={props.description}>
-                    <p class="mt-4 text-sm opacity-80 leading-snug">
+                    <p class="mt-4 text-sm leading-snug text-[var(--fgColor-muted)]">
                         {props.description}
                     </p>
                 </Show>

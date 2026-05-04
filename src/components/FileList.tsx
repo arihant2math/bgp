@@ -1,8 +1,8 @@
+import { Octicon } from "@primer/solid/octicon";
 import { createMemo, For, Show } from "solid-js";
 import { format } from "timeago.js";
 import type { CommitSummary } from "../lib/githubCommits.ts";
 import CommitListItem from "./CommitListItem.tsx";
-import { Octicon } from "@primer/solid/octicon";
 
 const commitCountFormatter = new Intl.NumberFormat();
 
@@ -37,8 +37,8 @@ function FileList(props: FileListProps) {
         props.historyLabel ?? commitCountLabel(props.latestCommitTotalCount);
 
     return (
-        <ul class="list rounded-md border border-base-300 bg-base-100">
-            <li class="list-row">
+        <ul class="overflow-hidden rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)]">
+            <li class="border-b border-[var(--borderColor-muted)] px-4 py-3">
                 <CommitListItem
                     commit={props.latestCommit}
                     historyLabel={headerHistoryLabel()}
@@ -51,7 +51,7 @@ function FileList(props: FileListProps) {
                         props.itemCommitsByPath?.[item.path];
 
                     return (
-                        <li class="list-row">
+                        <li class="grid gap-3 border-b border-[var(--borderColor-muted)] px-4 py-3 last:border-b-0 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto] md:items-center">
                             <a
                                 href={
                                     props.repoUrl +
@@ -62,7 +62,7 @@ function FileList(props: FileListProps) {
                                     "/" +
                                     item.path
                                 }
-                                class="flex min-w-0 items-center gap-2"
+                                class="flex min-w-0 items-center gap-2 text-[var(--fgColor-default)] hover:text-[var(--fgColor-accent)] hover:underline"
                             >
                                 <Octicon
                                     name={
@@ -72,18 +72,18 @@ function FileList(props: FileListProps) {
                                     }
                                     size={16}
                                     aria-hidden="true"
-                                    class="shrink-0 stroke-neutral-content fill-neutral-content"
+                                    class="shrink-0"
                                 />
                                 <span class="truncate">{item.name}</span>
                             </a>
                             <div
-                                class="min-w-0 truncate opacity-80"
+                                class="min-w-0 truncate text-sm text-[var(--fgColor-muted)]"
                                 title={itemCommit()?.message}
                             >
                                 <Show
                                     when={props.itemCommitsByPath !== undefined}
                                     fallback={
-                                        <span class="opacity-50">
+                                        <span class="text-[var(--fgColor-muted)]">
                                             Loading commit…
                                         </span>
                                     }
@@ -91,14 +91,16 @@ function FileList(props: FileListProps) {
                                     <Show
                                         when={itemCommit()}
                                         fallback={
-                                            <span class="opacity-50">—</span>
+                                            <span class="text-[var(--fgColor-muted)]">
+                                                —
+                                            </span>
                                         }
                                     >
                                         {(commit) => commit().message}
                                     </Show>
                                 </Show>
                             </div>
-                            <div class="shrink-0 text-xs opacity-70">
+                            <div class="shrink-0 text-xs text-[var(--fgColor-muted)]">
                                 <Show
                                     when={props.itemCommitsByPath !== undefined}
                                     fallback={<span>—</span>}

@@ -1,5 +1,5 @@
 import { useSearchParams } from "@solidjs/router";
-import { Button } from "@primer/solid";
+import { Button, Label, Spinner } from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch, createMemo } from "solid-js";
@@ -45,11 +45,11 @@ function CommitRow(props: { commit: CommitSummary }) {
     const primaryAuthor = () => props.commit.authors[0];
 
     return (
-        <li class="list-row items-start">
+        <li class="flex items-start gap-4 px-4 py-4">
             <Show
                 when={primaryAuthor()?.avatarUrl}
                 fallback={
-                    <div class="grid size-10 place-items-center rounded-full border border-base-300 bg-base-100">
+                    <div class="grid size-10 place-items-center rounded-full border border-[var(--borderColor-default)] bg-[var(--bgColor-muted)]">
                         <Octicon name="person" size={18} aria-hidden="true" />
                     </div>
                 }
@@ -73,14 +73,14 @@ function CommitRow(props: { commit: CommitSummary }) {
                                 href={commitUrl()}
                                 target="_blank"
                                 rel="noreferrer"
-                                class="link link-hover"
+                                class="text-[var(--fgColor-accent)] hover:underline"
                             >
                                 {props.commit.message}
                             </a>
                         )}
                     </Show>
                 </div>
-                <div class="mt-1 text-sm opacity-70">
+                <div class="mt-1 text-sm text-[var(--fgColor-muted)]">
                     {authorsText(props.commit)} committed{" "}
                     <time
                         dateTime={props.commit.committedDate}
@@ -153,18 +153,25 @@ function Commits(props: CommitsProps) {
         <RepoPageLayout profile={props.profile} repo={props.repo} active="code">
             <div class="mb-4 flex flex-wrap items-center gap-3">
                 <h1 class="text-xl font-semibold">Commit history</h1>
-                <div class="badge badge-neutral badge-outline">
-                    {props.tree}
-                </div>
+                <Label variant="secondary">{props.tree}</Label>
                 <Show when={path()}>
                     {(currentPath) => (
-                        <div class="badge badge-ghost">/{currentPath()}</div>
+                        <Label variant="default">/{currentPath()}</Label>
                     )}
                 </Show>
             </div>
 
             <Switch>
-                <Match when={commitsQuery.isPending}>Loading commits ...</Match>
+                <Match when={commitsQuery.isPending}>
+                    <div class="flex items-center gap-3 text-sm text-[var(--fgColor-muted)]">
+                        <Spinner
+                            size="small"
+                            srText={null}
+                            aria-hidden="true"
+                        />
+                        Loading commits…
+                    </div>
+                </Match>
                 <Match when={commitsQuery.isError}>Error loading commits</Match>
                 <Match when={commitsQuery.data}>
                     {(history) => (
@@ -172,12 +179,12 @@ function Commits(props: CommitsProps) {
                             <Show
                                 when={history().commits.length > 0}
                                 fallback={
-                                    <div class="rounded-md border border-base-300 bg-base-100 p-6 text-center opacity-70">
+                                    <div class="rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] p-6 text-center text-[var(--fgColor-muted)]">
                                         No commits found.
                                     </div>
                                 }
                             >
-                                <ul class="list rounded-md border border-base-300 bg-base-100">
+                                <ul class="overflow-hidden rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] divide-y divide-[var(--borderColor-muted)]">
                                     <For each={history().commits}>
                                         {(commit) => (
                                             <CommitRow commit={commit} />

@@ -1,6 +1,6 @@
-import { createSignal } from "solid-js";
+import { Button, TextInput } from "@primer/solid";
 import { useNavigate } from "@solidjs/router";
-import { Button } from "@primer/solid";
+import { createSignal } from "solid-js";
 
 function Login() {
     const navigate = useNavigate();
@@ -20,25 +20,27 @@ function Login() {
     };
 
     return (
-        <main class="min-h-screen overflow-hidden">
+        <main class="grid min-h-screen place-items-center overflow-hidden px-4">
             <form
                 onSubmit={handleSubmit}
-                class="flex flex-col max-w-md gap-2 items-center justify-center"
+                class="flex w-full max-w-md flex-col gap-3 rounded-md border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] p-6 shadow-sm"
             >
-                <input
-                    class="border rounded-md border-black p-1"
+                <h1 class="text-xl font-semibold">Sign in with a token</h1>
+                <TextInput
                     type="password"
                     value={token()}
                     onInput={(event) => setToken(event.currentTarget.value)}
                     autocomplete="off"
+                    placeholder="GitHub personal access token"
+                    block
                 />
                 <Button variant="primary" type="submit">
                     Login
                 </Button>
-                <p>
+                <p class="text-sm text-[var(--fgColor-muted)]">
                     Create a personal auth token (
                     <a
-                        class="text-blue-500 hover-text-blue-600"
+                        class="text-[var(--fgColor-accent)] hover:underline"
                         href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token"
                     >
                         Docs

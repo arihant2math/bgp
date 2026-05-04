@@ -1,16 +1,16 @@
-import FileList from "../../components/FileList.tsx";
-import FileRenderer from "../../components/FileRenderer.tsx";
-import RepoPageLayout from "../../components/RepoPageLayout.tsx";
-import { Button } from "@primer/solid";
+import { Button, Label, Spinner } from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
 import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch } from "solid-js";
-import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
 import { approximateNumber as approx } from "approximate-number";
 import Avatar from "../../components/Avatar.tsx";
-import { repoCommitsHref, repoHref } from "../../lib/hrefGen.ts";
+import FileList from "../../components/FileList.tsx";
+import FileRenderer from "../../components/FileRenderer.tsx";
+import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 import { decodeBase64Content } from "../../lib/content.ts";
 import { fetchDirectoryCommitMetadata } from "../../lib/githubCommits.ts";
+import { repoCommitsHref, repoHref } from "../../lib/hrefGen.ts";
+import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
 
 export type RepositoryProps = {
     profile: string;
@@ -89,12 +89,21 @@ function Repository(props: RepositoryProps) {
     return (
         <RepoPageLayout profile={props.profile} repo={props.repo} active="code">
             <Switch>
-                <Match when={metadataQuery.isPending}>Loading ...</Match>
+                <Match when={metadataQuery.isPending}>
+                    <div class="flex items-center gap-3 text-sm text-[var(--fgColor-muted)]">
+                        <Spinner
+                            size="small"
+                            srText={null}
+                            aria-hidden="true"
+                        />
+                        Loading…
+                    </div>
+                </Match>
                 <Match when={metadataQuery.isError}>Error</Match>
                 <Match when={metadataQuery.isSuccess}>
                     <>
                         <div class="flex min-h-12 flex-row items-center gap-2">
-                            <h1 class="text-xl flex flex-row items-center gap-2">
+                            <h1 class="flex flex-row items-center gap-2 text-xl">
                                 <Avatar
                                     href={metadataQuery.data.owner.avatar_url}
                                     size={24}
@@ -102,9 +111,9 @@ function Repository(props: RepositoryProps) {
                                 />
                                 {metadataQuery.data.name}
                             </h1>
-                            <div class="badge badge-neutral badge-outline text-xs">
+                            <Label variant="secondary" size="small">
                                 {metadataQuery.data.visibility}
-                            </div>
+                            </Label>
                             <div class="ml-auto flex items-center justify-end gap-2">
                                 <Button
                                     size="small"
@@ -153,16 +162,23 @@ function Repository(props: RepositoryProps) {
                                 </Button>
                             </div>
                         </div>
-                        <div class="divider my-2"></div>
-                        <div class="flex flex-row">
+                        <div class="my-2 border-t border-[var(--borderColor-default)]" />
+                        <div class="flex flex-row gap-6">
                             <div class="flex-3">
-                                <div>
+                                <div class="mb-3 text-sm text-[var(--fgColor-muted)]">
                                     {props.tree ??
                                         metadataQuery.data.default_branch}
                                 </div>
                                 <Switch>
                                     <Match when={contentsQuery.isPending}>
-                                        Loading ...
+                                        <div class="flex items-center gap-3 text-sm text-[var(--fgColor-muted)]">
+                                            <Spinner
+                                                size="small"
+                                                srText={null}
+                                                aria-hidden="true"
+                                            />
+                                            Loading…
+                                        </div>
                                     </Match>
                                     <Match when={contentsQuery.isError}>
                                         Error
@@ -221,7 +237,7 @@ function Repository(props: RepositoryProps) {
                                     />
                                 </Show>
                             </div>
-                            <div class="flex-1 flex flex-col gap-4">
+                            <div class="flex flex-1 flex-col gap-4">
                                 <div>
                                     <b>About</b>
                                     <p>{metadataQuery.data.description}</p>
@@ -236,7 +252,10 @@ function Repository(props: RepositoryProps) {
                                             size={16}
                                             aria-hidden="true"
                                         />
-                                        <a href={metadataQuery.data.homepage}>
+                                        <a
+                                            href={metadataQuery.data.homepage}
+                                            class="text-[var(--fgColor-accent)] hover:underline"
+                                        >
                                             {metadataQuery.data.homepage}
                                         </a>
                                     </div>
@@ -244,9 +263,12 @@ function Repository(props: RepositoryProps) {
                                 <div class="flex flex-wrap items-start gap-2">
                                     <For each={metadataQuery.data.topics}>
                                         {(item) => (
-                                            <div class="badge badge-info badge-outline w-fit text-xs">
+                                            <Label
+                                                variant="accent"
+                                                size="small"
+                                            >
                                                 {item}
-                                            </div>
+                                            </Label>
                                         )}
                                     </For>
                                 </div>

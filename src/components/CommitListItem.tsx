@@ -1,4 +1,4 @@
-import { Button } from "@primer/solid";
+import { Button, Spinner } from "@primer/solid";
 import { Octicon } from "@primer/solid/octicon";
 import { createMemo, createSignal, For, Show } from "solid-js";
 import { format } from "timeago.js";
@@ -63,7 +63,7 @@ function AuthorIcon(props: { author: CommitAuthor; offset: boolean }) {
             when={props.author.avatarUrl}
             fallback={
                 <div
-                    class={`grid place-items-center rounded-full border border-base-300 bg-base-100 ring-2 ring-base-100 ${offsetClass()}`}
+                    class={`grid place-items-center rounded-full border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] ring-2 ring-[var(--bgColor-default)] ${offsetClass()}`}
                     style={{ width: "24px", height: "24px" }}
                     title={displayName(props.author)}
                 >
@@ -76,7 +76,7 @@ function AuthorIcon(props: { author: CommitAuthor; offset: boolean }) {
                     href={avatarUrl()}
                     size={24}
                     alt={`${displayName(props.author)}'s avatar`}
-                    class={`ring-2 ring-base-100 ${offsetClass()}`}
+                    class={`ring-2 ring-[var(--bgColor-default)] ${offsetClass()}`}
                 />
             )}
         </Show>
@@ -111,7 +111,7 @@ function CommitBody(props: CommitListItemProps & { commit: CommitSummary }) {
                 </For>
                 <Show when={hiddenAvatarCount() > 0}>
                     <div
-                        class="-ml-2 grid place-items-center rounded-full border border-base-300 bg-base-100 px-1.5 text-[10px] font-medium ring-2 ring-base-100"
+                        class="-ml-2 grid place-items-center rounded-full border border-[var(--borderColor-default)] bg-[var(--bgColor-default)] px-1.5 text-[10px] font-medium ring-2 ring-[var(--bgColor-default)]"
                         style={{ height: "24px", "min-width": "24px" }}
                     >
                         +{hiddenAvatarCount()}
@@ -158,7 +158,7 @@ function CommitBody(props: CommitListItemProps & { commit: CommitSummary }) {
                 />
             </Show>
             <div class="ml-auto flex shrink-0 items-center gap-2">
-                <div class="flex items-center gap-2 text-xs opacity-70">
+                <div class="flex items-center gap-2 text-xs text-[var(--fgColor-muted)]">
                     <Show
                         when={props.commit.commitUrl}
                         fallback={
@@ -170,7 +170,7 @@ function CommitBody(props: CommitListItemProps & { commit: CommitSummary }) {
                         {(commitUrl) => (
                             <a
                                 href={commitUrl()}
-                                class="font-mono link link-hover"
+                                class="font-mono text-[var(--fgColor-accent)] hover:underline"
                                 target="_blank"
                                 rel="noreferrer"
                             >
@@ -203,11 +203,10 @@ function CommitListItem(props: CommitListItemProps) {
             when={props.commit !== undefined}
             fallback={
                 <div class="flex w-full items-center gap-2 text-sm">
-                    <span
-                        class="loading loading-spinner loading-xs"
-                        aria-hidden="true"
-                    />
-                    <span class="opacity-70">Loading latest commit…</span>
+                    <Spinner size="small" srText={null} aria-hidden="true" />
+                    <span class="text-[var(--fgColor-muted)]">
+                        Loading latest commit…
+                    </span>
                     <div class="ml-auto">
                         <HistoryButton
                             label={props.historyLabel}
@@ -226,7 +225,9 @@ function CommitListItem(props: CommitListItemProps) {
                             size={16}
                             aria-hidden="true"
                         />
-                        <span class="opacity-70">No commits yet</span>
+                        <span class="text-[var(--fgColor-muted)]">
+                            No commits yet
+                        </span>
                         <div class="ml-auto">
                             <HistoryButton
                                 label={props.historyLabel}

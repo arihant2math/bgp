@@ -1,8 +1,9 @@
-import { createMemo, type Component, For, Show } from "solid-js";
+import { TextInput } from "@primer/solid";
+import { Octicon } from "@primer/solid/octicon";
 import { useLocation } from "@solidjs/router";
+import { createMemo, For, Show, type Component } from "solid-js";
 import { appHref, stripAppBase } from "../lib/baseUrl.ts";
 import { profileHref, repoHref } from "../lib/hrefGen.ts";
-import { Octicon } from "@primer/solid/octicon";
 
 export type MainNavbarBreadcrumb = {
     label: string;
@@ -52,31 +53,48 @@ const MainNavbar: Component<MainNavbarProps> = (props) => {
     });
 
     return (
-        <nav class="navbar bg-base-100 shadow-sm">
-            <div class="flex-1 flex items-center gap-2">
-                <a href={appHref("/")}>
-                    <Octicon name="mark-github" size={32} aria-hidden="true" />
-                </a>
-                <div>
-                    <For each={breadcrumbs()}>
-                        {(breadcrumb, index) => (
-                            <>
-                                <a href={breadcrumb.href}>{breadcrumb.label}</a>
-                                <Show when={index() < breadcrumbs().length - 1}>
-                                    <span class="mx-2 text-base-content/50">
-                                        /
-                                    </span>
-                                </Show>
-                            </>
-                        )}
-                    </For>
+        <nav class="border-b border-[var(--borderColor-default)] bg-[var(--bgColor-default)]">
+            <div class="mx-auto flex min-h-14 max-w-6xl items-center gap-4 px-4">
+                <div class="flex min-w-0 flex-1 items-center gap-2">
+                    <a href={appHref("/")} aria-label="Home">
+                        <Octicon
+                            name="mark-github"
+                            size={32}
+                            aria-hidden="true"
+                        />
+                    </a>
+                    <div class="min-w-0 truncate text-sm text-[var(--fgColor-muted)]">
+                        <For each={breadcrumbs()}>
+                            {(breadcrumb, index) => (
+                                <>
+                                    <a
+                                        href={breadcrumb.href}
+                                        class="text-[var(--fgColor-default)] hover:text-[var(--fgColor-accent)] hover:underline"
+                                    >
+                                        {breadcrumb.label}
+                                    </a>
+                                    <Show
+                                        when={
+                                            index() < breadcrumbs().length - 1
+                                        }
+                                    >
+                                        <span class="mx-2 text-[var(--fgColor-muted)]">
+                                            /
+                                        </span>
+                                    </Show>
+                                </>
+                            )}
+                        </For>
+                    </div>
                 </div>
-            </div>
-            <div class="flex gap-2">
-                <input
-                    type="text"
+                <TextInput
+                    type="search"
                     placeholder="Search"
-                    class="input input-bordered w-24 md:w-auto"
+                    size="small"
+                    leadingVisual={
+                        <Octicon name="search" size={16} aria-hidden="true" />
+                    }
+                    class="w-24 md:w-64"
                 />
             </div>
         </nav>
