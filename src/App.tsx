@@ -15,6 +15,22 @@ import { appBasePath } from "./lib/baseUrl.ts";
 
 const EmptyPage = () => <main></main>;
 
+function safeDecodeUriComponent(value: string) {
+    try {
+        return decodeURIComponent(value);
+    } catch {
+        return value;
+    }
+}
+
+function parseSplatPath(path: string | string[] | undefined) {
+    const segments = Array.isArray(path) ? path : path ? [path] : [];
+    return segments
+        .flatMap((segment) => segment.split("/"))
+        .filter(Boolean)
+        .map(safeDecodeUriComponent);
+}
+
 const AppLayout: Component<RouteSectionProps> = (props) => (
     <div>
         <MainNavbar />
@@ -83,13 +99,7 @@ function App() {
                         profile={props.params.profile ?? ""}
                         repo={props.params.repo ?? ""}
                         tree={props.params.tree ?? ""}
-                        path={
-                            Array.isArray(props.params.path)
-                                ? props.params.path
-                                : props.params.path
-                                  ? [props.params.path]
-                                  : []
-                        }
+                        path={parseSplatPath(props.params.path)}
                     />
                 ))}
             />
@@ -111,13 +121,7 @@ function App() {
                         profile={props.params.profile ?? ""}
                         repo={props.params.repo ?? ""}
                         tree={props.params.tree ?? ""}
-                        path={
-                            Array.isArray(props.params.path)
-                                ? props.params.path
-                                : props.params.path
-                                  ? [props.params.path]
-                                  : []
-                        }
+                        path={parseSplatPath(props.params.path)}
                     />
                 ))}
             />
