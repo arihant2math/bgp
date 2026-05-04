@@ -355,11 +355,14 @@ export async function fetchRepoLabels(args: {
     repo: string;
 }): Promise<WorkItemLabel[]> {
     const octokit = getOctokit();
-    const labels = await octokit.paginate(octokit.rest.issues.listLabelsForRepo, {
-        owner: args.owner,
-        repo: args.repo,
-        per_page: 100,
-    });
+    const labels = await octokit.paginate(
+        octokit.rest.issues.listLabelsForRepo,
+        {
+            owner: args.owner,
+            repo: args.repo,
+            per_page: 100,
+        },
+    );
 
     return labels
         .map((label) => ({
@@ -376,12 +379,15 @@ export async function fetchRepoMilestones(args: {
     repo: string;
 }): Promise<WorkItemMilestone[]> {
     const octokit = getOctokit();
-    const milestones = await octokit.paginate(octokit.rest.issues.listMilestones, {
-        owner: args.owner,
-        repo: args.repo,
-        state: "all",
-        per_page: 100,
-    });
+    const milestones = await octokit.paginate(
+        octokit.rest.issues.listMilestones,
+        {
+            owner: args.owner,
+            repo: args.repo,
+            state: "all",
+            per_page: 100,
+        },
+    );
 
     return milestones
         .map((milestone) => ({
@@ -397,11 +403,14 @@ export async function fetchRepoAssignees(args: {
     repo: string;
 }): Promise<WorkItemUser[]> {
     const octokit = getOctokit();
-    const assignees = await octokit.paginate(octokit.rest.issues.listAssignees, {
-        owner: args.owner,
-        repo: args.repo,
-        per_page: 100,
-    });
+    const assignees = await octokit.paginate(
+        octokit.rest.issues.listAssignees,
+        {
+            owner: args.owner,
+            repo: args.repo,
+            per_page: 100,
+        },
+    );
 
     return assignees
         .map((user) => ({
