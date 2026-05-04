@@ -4,12 +4,13 @@ import { useQuery } from "@tanstack/solid-query";
 import { For, Match, Show, Switch } from "solid-js";
 import { approximateNumber as approx } from "approximate-number";
 import Avatar from "../../components/Avatar.tsx";
+import BranchSelector from "../../components/BranchSelector.tsx";
 import FileList from "../../components/FileList.tsx";
 import FileRenderer from "../../components/FileRenderer.tsx";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 import { decodeBase64Content } from "../../lib/content.ts";
 import { fetchDirectoryCommitMetadata } from "../../lib/githubCommits.ts";
-import { repoCommitsHref, repoHref } from "../../lib/hrefGen.ts";
+import { repoCommitsHref } from "../../lib/hrefGen.ts";
 import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
 
 export type RepositoryProps = {
@@ -165,9 +166,20 @@ function Repository(props: RepositoryProps) {
                         <div class="my-2 border-t border-[var(--borderColor-default)]" />
                         <div class="flex flex-row gap-6">
                             <div class="flex-3">
-                                <div class="mb-3 text-sm text-[var(--fgColor-muted)]">
-                                    {props.tree ??
-                                        metadataQuery.data.default_branch}
+                                <div class="mb-3">
+                                    <BranchSelector
+                                        profile={props.profile}
+                                        repo={props.repo}
+                                        currentRef={
+                                            props.tree ??
+                                            metadataQuery.data.default_branch
+                                        }
+                                        defaultBranch={
+                                            metadataQuery.data.default_branch
+                                        }
+                                        path={[]}
+                                        showCounts
+                                    />
                                 </div>
                                 <Switch>
                                     <Match when={contentsQuery.isPending}>
@@ -186,15 +198,13 @@ function Repository(props: RepositoryProps) {
                                     <Match when={contentsQuery.isSuccess}>
                                         <FileList
                                             contents={contentsQuery.data}
+                                            profile={props.profile}
+                                            repo={props.repo}
                                             tree={
                                                 props.tree ??
                                                 metadataQuery.data
                                                     .default_branch
                                             }
-                                            repoUrl={repoHref(
-                                                props.profile,
-                                                props.repo,
-                                            )}
                                             latestCommit={
                                                 commitMetadataQuery.isError
                                                     ? null

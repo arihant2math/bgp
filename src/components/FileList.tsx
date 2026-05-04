@@ -2,6 +2,7 @@ import { Octicon } from "@primer/solid/octicon";
 import { createMemo, For, Show } from "solid-js";
 import { format } from "timeago.js";
 import type { CommitSummary } from "../lib/githubCommits.ts";
+import { repoTreeHref } from "../lib/hrefGen.ts";
 import CommitListItem from "./CommitListItem.tsx";
 
 const commitCountFormatter = new Intl.NumberFormat();
@@ -13,8 +14,9 @@ function commitCountLabel(count?: number) {
 
 export type FileListProps = {
     contents: any[];
+    profile: string;
+    repo: string;
     tree: string;
-    repoUrl: string;
     latestCommit?: CommitSummary | null;
     latestCommitTotalCount?: number;
     itemCommitsByPath?: Record<string, CommitSummary | null>;
@@ -53,15 +55,12 @@ function FileList(props: FileListProps) {
                     return (
                         <li class="grid gap-3 border-b border-[var(--borderColor-muted)] px-4 py-3 last:border-b-0 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto] md:items-center">
                             <a
-                                href={
-                                    props.repoUrl +
-                                    "/" +
-                                    "tree" +
-                                    "/" +
-                                    props.tree +
-                                    "/" +
-                                    item.path
-                                }
+                                href={repoTreeHref(
+                                    props.profile,
+                                    props.repo,
+                                    props.tree,
+                                    item.path.split("/"),
+                                )}
                                 class="flex min-w-0 items-center gap-2 text-[var(--fgColor-default)] hover:text-[var(--fgColor-accent)] hover:underline"
                             >
                                 <Octicon

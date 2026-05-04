@@ -2,9 +2,10 @@ import { useQuery } from "@tanstack/solid-query";
 import { getOctokit, parseRestOctokitResponse } from "../../lib/octokit.ts";
 import RepoPageLayout from "../../components/RepoPageLayout.tsx";
 import { For, Match, Show, Switch } from "solid-js";
+import BranchSelector from "../../components/BranchSelector.tsx";
 import FileList from "../../components/FileList.tsx";
 import FileRenderer from "../../components/FileRenderer.tsx";
-import { repoCommitsHref, repoHref } from "../../lib/hrefGen.ts";
+import { repoCommitsHref, repoTreeHref } from "../../lib/hrefGen.ts";
 import { decodeBase64Content } from "../../lib/content.ts";
 import { fetchDirectoryCommitMetadata } from "../../lib/githubCommits.ts";
 
@@ -16,8 +17,18 @@ export type RepositoryItemProps = {
 };
 
 function RepositoryItem(props: RepositoryItemProps) {
+    const metadataQuery = useQuery(() => ({
+        queryKey: ["repoMetadata", props.profile, props.repo],
+        queryFn: () =>
+            getOctokit()
+                .rest.repos.get({
+                    owner: props.profile,
+                    repo: props.repo,
+                })
+                .then((res) => parseRestOctokitResponse(res)),
+    }));
+
     // TODO: Standardize contents queries
-    console.log(props);
     const contentsQuery = useQuery(() => ({
         queryKey: ["tree", props.profile, props.repo, props.tree, props.path],
         queryFn: () =>
@@ -69,50 +80,62 @@ function RepositoryItem(props: RepositoryItemProps) {
 
     return (
         <RepoPageLayout profile={props.profile} repo={props.repo} active="code">
-            {/* TODO: use "/" instead of breadcrumbs */}
-            <div class="breadcrumbs text-sm">
-                <ul>
-                    <li>
-                        <a
-                            href={
-                                repoHref(props.profile, props.repo) +
-                                "/tree/" +
-                                props.tree
-                            }
-                        >
-                            {props.repo}
-                        </a>
-                    </li>
-                    <For each={props.path}>
-                        {(segment, index) => (
-                            <Switch>
-                                <Match when={index() === props.path.length - 1}>
-                                    <li>{segment}</li>
-                                </Match>
-                                <Match when={index() < props.path.length - 1}>
-                                    <li>
-                                        <a
-                                            href={
-                                                repoHref(
+            <div class="mb-4 flex flex-wrap items-center gap-3">
+                <BranchSelector
+                    profile={props.profile}
+                    repo={props.repo}
+                    currentRef={props.tree}
+                    defaultBranch={metadataQuery.data?.default_branch}
+                    path={props.path}
+                    compact
+                />
+                <div class="breadcrumbs text-sm">
+                    <ul>
+                        <li>
+                            <a
+                                href={repoTreeHref(
+                                    props.profile,
+                                    props.repo,
+                                    props.tree,
+                                )}
+                            >
+                                {props.repo}
+                            </a>
+                        </li>
+                        <For each={props.path}>
+                            {(segment, index) => (
+                                <Switch>
+                                    <Match
+                                        when={index() === props.path.length - 1}
+                                    >
+                                        <li>{segment}</li>
+                                    </Match>
+                                    <Match
+                                        when={
+                                            index() < props.path.length - 1
+                                        }
+                                    >
+                                        <li>
+                                            <a
+                                                href={repoTreeHref(
                                                     props.profile,
                                                     props.repo,
-                                                ) +
-                                                "/tree/" +
-                                                props.tree +
-                                                "/" +
-                                                props.path
-                                                    .slice(0, index() + 1)
-                                                    .join("/")
-                                            }
-                                        >
-                                            {segment}
-                                        </a>
-                                    </li>
-                                </Match>
-                            </Switch>
-                        )}
-                    </For>
-                </ul>
+                                                    props.tree,
+                                                    props.path.slice(
+                                                        0,
+                                                        index() + 1,
+                                                    ),
+                                                )}
+                                            >
+                                                {segment}
+                                            </a>
+                                        </li>
+                                    </Match>
+                                </Switch>
+                            )}
+                        </For>
+                    </ul>
+                </div>
             </div>
             <Switch>
                 <Match when={contentsQuery.isPending}>Loading ...</Match>
@@ -123,11 +146,9 @@ function RepositoryItem(props: RepositoryItemProps) {
                             <>
                                 <FileList
                                     contents={contentsQuery.data}
+                                    profile={props.profile}
+                                    repo={props.repo}
                                     tree={props.tree}
-                                    repoUrl={repoHref(
-                                        props.profile,
-                                        props.repo,
-                                    )}
                                     latestCommit={
                                         commitMetadataQuery.isError
                                             ? null
